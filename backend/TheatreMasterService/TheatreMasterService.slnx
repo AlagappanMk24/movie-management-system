@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/TheatreMasterService.Api/TheatreMasterService.Api.csproj" />
+    <Project Path="src/TheatreMasterService.Application/TheatreMasterService.Application.csproj" />
+    <Project Path="src/TheatreMasterService.Domain/TheatreMasterService.Domain.csproj" />
+    <Project Path="src/TheatreMasterService.Infrastructure/TheatreMasterService.Infrastructure.csproj" />
+  </Folder>
+</Solution>
