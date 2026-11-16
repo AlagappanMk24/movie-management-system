@@ -1,0 +1,44 @@
+<Solution>
+  <Folder Name="/BookingService/" />
+  <Folder Name="/BookingService/src/">
+    <Project Path="BookingService/src/BookingService.Api/BookingService.Api.csproj" />
+    <Project Path="BookingService/src/BookingService.Application/BookingService.Application.csproj" />
+    <Project Path="BookingService/src/BookingService.Domain/BookingService.Domain.csproj" />
+    <Project Path="BookingService/src/BookingService.Infrastructure/BookingService.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/EmailService/" />
+  <Folder Name="/EmailService/src/">
+    <Project Path="EmailService/src/EmailService.Api/EmailService.Api.csproj" />
+    <Project Path="EmailService/src/EmailService.Application/EmailService.Application.csproj" />
+    <Project Path="EmailService/src/EmailService.Infrastructure/EmailService.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/MoviesService/" />
+  <Folder Name="/MoviesService/src/">
+    <Project Path="MoviesService/src/MoviesService.Api/MoviesService.Api.csproj" />
+    <Project Path="MoviesService/src/MoviesService.Application/MoviesService.Application.csproj" />
+    <Project Path="MoviesService/src/MoviesService.Domain/MoviesService.Domain.csproj" />
+    <Project Path="MoviesService/src/MoviesService.Infrastructure/MoviesService.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/ReviewService/" />
+  <Folder Name="/ReviewService/src/">
+    <Project Path="ReviewService/src/ReviewService.Api/ReviewService.Api.csproj" />
+    <Project Path="ReviewService/src/ReviewService.Application/ReviewService.Application.csproj" />
+    <Project Path="ReviewService/src/ReviewService.Domain/ReviewService.Domain.csproj" />
+    <Project Path="ReviewService/src/ReviewService.Infrastructure/ReviewService.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/TheatreMasterService/" />
+  <Folder Name="/TheatreMasterService/src/">
+    <Project Path="TheatreMasterService/src/TheatreMasterService.Api/TheatreMasterService.Api.csproj" />
+    <Project Path="TheatreMasterService/src/TheatreMasterService.Application/TheatreMasterService.Application.csproj" />
+    <Project Path="TheatreMasterService/src/TheatreMasterService.Domain/TheatreMasterService.Domain.csproj" />
+    <Project Path="TheatreMasterService/src/TheatreMasterService.Infrastructure/TheatreMasterService.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/UserService/" />
+  <Folder Name="/UserService/src/">
+    <Project Path="UserService/src/UserService.Api/UserService.Api.csproj" />
+    <Project Path="UserService/src/UserService.Application/UserService.Application.csproj" />
+    <Project Path="UserService/src/UserService.Domain/UserService.Domain.csproj" />
+    <Project Path="UserService/src/UserService.Infrastructure/UserService.Infrastructure.csproj" />
+  </Folder>
+  <Project Path="Gateway.Api/Gateway.Api.csproj" />
+</Solution>

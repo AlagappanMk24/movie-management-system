@@ -1,0 +1,202 @@
+{
+  "Routes": [
+    // ==========================================
+    // 1. USER & AUTHENTICATION SERVICE ROUTES
+    // ==========================================
+    {
+      // Authenticated User profile & management endpoints
+      "UpstreamPathTemplate": "/api/user/{everything}",
+      "UpstreamHttpMethod": [ "Get", "Post", "Put", "Delete" ],
+      "DownstreamPathTemplate": "/api/user/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7195
+        }
+      ],
+      "SwaggerKey": "Userservice",
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "IdentityServiceKey"
+      }
+    },
+    {
+      // Public Authentication login/register endpoints (No JWT required)
+      "UpstreamPathTemplate": "/api/auth/{everything}",
+      "UpstreamHttpMethod": [ "Post" ],
+      "DownstreamPathTemplate": "/api/Auth/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7195
+        }
+      ],
+      "SwaggerKey": "Userservice"
+    },
+
+    // ==========================================
+    // 2. BOOKING SERVICE ROUTES
+    // ==========================================
+    {
+      // Ticket booking, seat reservation, and payment coordination endpoints
+      "UpstreamPathTemplate": "/api/booking/{everything}",
+      "UpstreamHttpMethod": [ "Get", "Post", "Put", "Delete" ],
+      "DownstreamPathTemplate": "/api/booking/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7277
+        }
+      ],
+      "SwaggerKey": "Bookingservice",
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "IdentityServiceKey"
+      }
+    },
+
+    // ==========================================
+    // 3. MOVIE & MEDIA SERVICE ROUTES
+    // ==========================================
+    {
+      // Movie catalog, show timings, and details management endpoints
+      "UpstreamPathTemplate": "/api/movies/{everything}",
+      "UpstreamHttpMethod": [ "Get", "Post", "Put", "Delete" ],
+      "DownstreamPathTemplate": "/api/movies/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7238
+        }
+      ],
+      "SwaggerKey": "Movieservice",
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "IdentityServiceKey"
+      }
+    },
+    {
+      // Public static poster image file assets
+      "UpstreamPathTemplate": "/posters/{everything}",
+      "UpstreamHttpMethod": [ "GET" ],
+      "DownstreamPathTemplate": "/posters/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7238
+        }
+      ],
+      "SwaggerKey": "Movieservice"
+      //"AuthenticationOptions": {
+      //  "AuthenticationProviderKey": "IdentityServiceKey"
+      //}
+    },
+
+    // ==========================================
+    // 4. THEATRE MASTER SERVICE ROUTES
+    // ==========================================
+    {
+      // Theatre complexes, screens, and auditoriums management endpoints
+      "UpstreamPathTemplate": "/api/theatre/{everything}",
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
+      "DownstreamPathTemplate": "/api/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7293
+        }
+      ],
+      "SwaggerKey": "TheatreMasterService",
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "IdentityServiceKey"
+      }
+    },
+
+    // ==========================================
+    // 5. REVIEW SERVICE ROUTES
+    // ==========================================
+    {
+      // User movie reviews and ratings management endpoints
+      "UpstreamPathTemplate": "/api/review/{everything}",
+      "UpstreamHttpMethod": [ "Get", "Post", "Put", "Delete" ],
+      "DownstreamPathTemplate": "/api/Review/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7245
+        }
+      ],
+      "SwaggerKey": "ReviewService",
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "IdentityServiceKey"
+      }
+    }
+  ],
+
+  // ==========================================
+  // SWAGGER AGGREGATION ENDPOINTS
+  // ==========================================
+  "SwaggerEndPoints": [
+    {
+      "Key": "TheatreMasterService",
+      "Config": [
+        {
+          "Name": "TheatreMaster Service API",
+          "Version": "v1",
+          "Url": "https://localhost:7293/swagger/v1/swagger.json"
+        }
+      ]
+    },
+    {
+      "Key": "Bookingservice",
+      "Config": [
+        {
+          "Name": "Booking Service API",
+          "Version": "v1",
+          "Url": "https://localhost:7277/swagger/v1/swagger.json"
+        }
+      ]
+    },
+    {
+      "Key": "Userservice",
+      "Config": [
+        {
+          "Name": "User Service API",
+          "Version": "v1",
+          "Url": "https://localhost:7255/swagger/v1/swagger.json"
+        }
+      ]
+    },
+    {
+      "Key": "Movieservice",
+      "Config": [
+        {
+          "Name": "Movie Service API",
+          "Version": "v1",
+          "Url": "https://localhost:7238/swagger/v1/swagger.json"
+        }
+      ]
+    },
+    {
+      "Key": "ReviewService",
+      "Config": [
+        {
+          "Name": "Review Service API",
+          "Version": "v1",
+          "Url": "https://localhost:7245/swagger/v1/swagger.json"
+        }
+      ]
+    }
+  ],
+
+  // ==========================================
+  // GLOBAL GATEWAY CONFIGURATION
+  // ==========================================
+  "GlobalConfiguration": {
+    "BaseUrl": "https://localhost:7000"
+  }
+}

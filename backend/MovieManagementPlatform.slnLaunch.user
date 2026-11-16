@@ -1,0 +1,35 @@
+[
+  {
+    "Name": "New Profile",
+    "Projects": [
+      {
+        "Path": "Gateway.Api\\Gateway.Api.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "EmailService\\src\\EmailService.Api\\EmailService.Api.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "MoviesService\\src\\MoviesService.Api\\MoviesService.Api.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "ReviewService\\src\\ReviewService.Api\\ReviewService.Api.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "BookingService\\src\\BookingService.Api\\BookingService.Api.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "TheatreMasterService\\src\\TheatreMasterService.Api\\TheatreMasterService.Api.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "UserService\\src\\UserService.Api\\UserService.Api.csproj",
+        "Action": "Start"
+      }
+    ]
+  }
+]
