@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/MoviesService.Api/MoviesService.Api.csproj" />
+    <Project Path="src/MoviesService.Application/MoviesService.Application.csproj" />
+    <Project Path="src/MoviesService.Domain/MoviesService.Domain.csproj" />
+    <Project Path="src/MoviesService.Infrastructure/MoviesService.Infrastructure.csproj" />
+  </Folder>
+</Solution>
