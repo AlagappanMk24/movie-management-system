@@ -3,7 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using ReviewService.Application.Abstractions.Persistence;
 using ReviewService.Infrastructure.Persistence.Context;
-using ReviewService.Infrastructure.Repositories;
+using ReviewService.Infrastructure.Persistence.Repositories;
 
 namespace ReviewService.Infrastructure.Extensions
 {
@@ -19,7 +19,7 @@ namespace ReviewService.Infrastructure.Extensions
         {
             services.AddDbContext<ReviewDbContext>(options =>
                 options.UseSqlServer(configuration.GetConnectionString("ReviewServiceConnection")));
-
+            services.AddScoped<DapperContext>();
             services.AddScoped<IReviewRepository, ReviewRepository>();
 
             return services;

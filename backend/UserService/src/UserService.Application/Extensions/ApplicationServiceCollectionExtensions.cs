@@ -17,7 +17,7 @@ namespace UserService.Application.Extensions
         /// <returns>The updated service collection.</returns>
         public static IServiceCollection AddApplication(this IServiceCollection services)
         {
-            services.AddScoped<IUserService, UserServices>();
+            services.AddScoped<IUserService, UserService.Application.Services.UserService>();
             services.AddScoped<IAuthService, AuthService>();
 
             services.AddValidatorsFromAssembly(typeof(ApplicationServiceCollectionExtensions).Assembly);

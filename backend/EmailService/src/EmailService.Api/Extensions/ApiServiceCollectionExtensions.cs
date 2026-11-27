@@ -1,7 +1,5 @@
 ﻿using EmailService.Api.Consumers;
 using EmailService.Application.Models;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace EmailService.Api.Extensions
 {
@@ -13,7 +11,7 @@ namespace EmailService.Api.Extensions
         /// <summary>Configures email settings options, background RabbitMQ consumers, and controllers.</summary>
         public static IServiceCollection AddApiServices(this IServiceCollection services, IConfiguration configuration)
         {
-            services.Configure<EmailSetting>(configuration.GetSection("EmailSettings"));
+            services.Configure<EmailSettings>(configuration.GetSection("EmailSettings"));
             services.AddHostedService<BookingConfirmedConsumer>();
 
             services.AddControllers();

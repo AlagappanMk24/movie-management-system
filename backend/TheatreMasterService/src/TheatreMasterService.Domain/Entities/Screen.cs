@@ -1,17 +1,15 @@
-﻿using System.Text.Json.Serialization;
+﻿using Shared.Contracts.Common;
+using System.Text.Json.Serialization;
 
 namespace TheatreMasterService.Domain.Entities
 {
     /// <summary>
     /// Represents a specific auditorium or screen inside a theatre.
     /// </summary>
-    public class Screen
+    public class Screen : BaseEntity
     {
-        /// <summary>Gets or sets the unique identifier for the screen.</summary>
-        public int ScreenId { get; set; }
-
         /// <summary>Gets or sets the foreign key identifier of the parent theatre.</summary>
-        public int TheatreId { get; set; }
+        public Guid TheatreId { get; set; }
 
         /// <summary>Gets or sets the navigation property for the parent theatre.</summary>
         [JsonIgnore]
@@ -26,14 +24,15 @@ namespace TheatreMasterService.Domain.Entities
         /// <summary>Gets or sets the maximum seating capacity of the screen.</summary>
         public int SeatCapacity { get; set; }
 
+        // NEW
+        public int Rows { get; set; }              // e.g., 10 → rows A..J
+        public int SeatsPerRow { get; set; }       // e.g., 12 → A1..A12
+
+        // Derived
+        public int ComputedCapacity => Rows * SeatsPerRow;
+
         /// <summary>Gets or sets the collection of movie shows scheduled for this screen.</summary>
         [JsonIgnore]
         public ICollection<Show>? Shows { get; set; }
-
-        /// <summary>Gets or sets the timestamp when the screen record was created.</summary>
-        public DateTime Created { get; set; }
-
-        /// <summary>Gets or sets the timestamp when the screen record was last modified.</summary>
-        public DateTime Modified { get; set; }
     }
 }

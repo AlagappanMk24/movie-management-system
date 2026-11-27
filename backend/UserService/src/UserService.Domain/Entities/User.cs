@@ -1,16 +1,13 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.Text.Json.Serialization;
+﻿using Shared.Contracts.Common;
+using System.ComponentModel.DataAnnotations;
 
 namespace UserService.Domain.Entities
 {
     /// <summary>
     /// Represents a user entity.
     /// </summary>
-    public class User
+    public class User : BaseEntity
     {
-        /// <summary>Gets or sets the unique user identifier.</summary>
-        public int UserId { get; set; }
-
         /// <summary>Gets or sets the username.</summary>
         public string UserName { get; set; }
 
@@ -29,11 +26,5 @@ namespace UserService.Domain.Entities
 
         /// <summary>Gets or sets the user role.</summary>
         public string? Role { get; set; }
-
-        /// <summary>Gets or sets the creation timestamp.</summary>
-        public DateTime Created { get; set; }
-
-        /// <summary>Gets or sets the last modification timestamp.</summary>
-        public DateTime Modified { get; set; }
     }
 }

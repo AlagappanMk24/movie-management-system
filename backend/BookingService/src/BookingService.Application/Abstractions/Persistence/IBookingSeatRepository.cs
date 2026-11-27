@@ -1,4 +1,6 @@
 ﻿using BookingService.Application.DTOs.Excel;
+using BookingService.Domain.Entities;
+using System.Data;
 
 namespace BookingService.Application.Abstractions.Persistence
 {
@@ -13,13 +15,18 @@ namespace BookingService.Application.Abstractions.Persistence
         /// <param name="bookingId">The booking identifier.</param>
         /// <param name="showId">The show identifier.</param>
         /// <param name="seats">The list of seat TVP DTO records.</param>
-        Task BulkInsertSeatsAsync(int bookingId, int showId, List<BookingSeatTvpDto> seats);
+        Task BulkInsertSeatsAsync(Guid bookingId, Guid showId, List<BookingSeatTvpDto> seats);
 
         /// <summary>
         /// Retrieves a list of booked seat numbers associated with a specific booking identifier.
         /// </summary>
         /// <param name="bookingId">The booking identifier.</param>
         /// <returns>A list of seat numbers as strings.</returns>
-        Task<List<string>> GetBookedSeatsByBookingIdAsync(int bookingId);
+        Task<List<string>> GetBookedSeatsByBookingIdAsync(Guid bookingId);
+        Task<HashSet<string>> GetOccupiedSeatNosAsync(Guid showId);
+        Task<List<BookingSeat>> GetSeatsByBookingIdAsync(Guid bookingId);
+        Task InsertSeatsAsync(Guid bookingId, Guid showId, IEnumerable<BookingSeat> seats, IDbConnection conn, IDbTransaction tx);
+
+        Task SoftDeleteSeatsByBookingIdAsync(Guid bookingId);
     }
 }

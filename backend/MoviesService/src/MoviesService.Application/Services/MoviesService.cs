@@ -1,6 +1,8 @@
-﻿using MoviesService.Application.Abstractions;
+﻿using Microsoft.Extensions.Logging;
+using MoviesService.Application.Abstractions;
 using MoviesService.Application.Abstractions.Persistence;
-using MoviesService.Application.DTOs;
+using MoviesService.Application.DTOs.Request;
+using MoviesService.Application.DTOs.Response;
 using MoviesService.Application.Helpers;
 using MoviesService.Domain.Entities;
 
@@ -9,20 +11,17 @@ namespace MoviesService.Application.Services
     /// <summary>
     /// Implements business logic operations for movie management, integrating data access, gateway validation, and file handling.
     /// </summary>
-    public class MoviesService(IMoviesRepository moviesRepository, IMicroServiceGateway microServiceGateway, ImageHelper imageHelper) : IMoviesService
+    public class MoviesService(IMoviesRepository moviesRepository, IMicroServiceGateway microServiceGateway, ImageHelper imageHelper, ILogger<MoviesService> logger) : IMoviesService
     {
         #region Configuration
         private readonly IMoviesRepository _moviesRepository = moviesRepository;
         private readonly IMicroServiceGateway _microServiceGateway = microServiceGateway;
         private readonly ImageHelper _imageHelper = imageHelper;
+        private readonly ILogger<MoviesService> _logger = logger;
         #endregion
 
         #region CreateMoviesAsync
-        /// <summary>
-        /// Creates a new movie record, saving any uploaded poster image and persisting the entity via repository.
-        /// </summary>
-        /// <param name="dto">The movie creation payload.</param>
-        /// <returns>The created movie entity.</returns>
+        /// <inheritdoc/>
         public async Task<Movies> CreateMoviesAsync(MovieCreateUpdateDto dto)
         {
             string? posterUrl = null;
@@ -34,6 +33,7 @@ namespace MoviesService.Application.Services
 
             var movie = new Movies
             {
+                Id = Guid.NewGuid(),
                 Title = dto.Title,
                 Genre = dto.Genre,
                 ReleaseDate = dto.ReleaseDate,
@@ -45,8 +45,9 @@ namespace MoviesService.Application.Services
                 DurationMinutes = dto.DurationMinutes,
                 TrailerUrl = dto.TrailerUrl,
                 PosterUrl = posterUrl,
-                Created = DateTime.Now,
-                Modified = DateTime.Now
+                Created = DateTime.UtcNow,
+                Modified = DateTime.UtcNow,
+                IsDeleted = false
             };
 
             return await _moviesRepository.CreateMoviesAsync(movie);
@@ -54,29 +55,55 @@ namespace MoviesService.Application.Services
         #endregion
 
         #region DeleteMoviesAsync
-        /// <summary>
-        /// Deletes a movie by ID after confirming through external gateways that no active shows or bookings depend on it.
-        /// </summary>
-        /// <param name="id">The unique identifier of the movie.</param>
-        /// <returns>True if deleted successfully.</returns>
-        /// <exception cref="InvalidOperationException">Thrown when active shows or bookings exist for the movie.</exception>
-        public async Task<bool> DeleteMoviesAsync(int id)
+        /// <inheritdoc/>
+        public async Task<bool> DeleteMoviesAsync(Guid id)
         {
+            // 1. Fetch movie to get the PosterUrl before marking as deleted
+            var movie = await _moviesRepository.GetMoviesByIdAsync(id);
+            if (movie == null)
+            {
+                throw new KeyNotFoundException("Movie not found.");
+            }
+
+            // 2. Check downstream dependencies
             var hasShow = await _microServiceGateway.HasShow(id);
             if (hasShow)
                 throw new InvalidOperationException("Cannot delete movie with active shows.");
+
             var hasBooking = await _microServiceGateway.HasBooking(id);
             if (hasBooking)
                 throw new InvalidOperationException("Cannot delete movie with active bookings.");
-            return await _moviesRepository.DeleteMoviesAsync(id);
+
+            var deleted = await _moviesRepository.DeleteMoviesAsync(id);
+            if (!deleted)
+                return false;
+
+            // 4. Clean up the physical poster file from disk if it exists
+            if (!string.IsNullOrEmpty(movie.PosterUrl))
+            {
+                var relativePath = movie.PosterUrl.TrimStart('/', '\\').Replace('/', Path.DirectorySeparatorChar);
+                var filePath = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", relativePath));
+
+                if (File.Exists(filePath))
+                {
+                    try
+                    {
+                        File.Delete(filePath);
+                    }
+                    catch(Exception ex)
+                    {
+                        // Optional: Log warning if file deletion fails, but do not block the soft delete transaction
+                        _logger.LogError(ex, "An error occurred while deleting the poster file for movie ID {MovieId}", id);
+                    }
+                }
+            }
+
+            return true;
         }
         #endregion
 
         #region GetMoviesAsync
-        /// <summary>
-        /// Retrieves all movie records from the repository.
-        /// </summary>
-        /// <returns>A collection of movies.</returns>
+        /// <inheritdoc/>
         public async Task<IEnumerable<Movies>> GetMoviesAsync()
         {
             return await _moviesRepository.GetMoviesAsync();
@@ -84,29 +111,20 @@ namespace MoviesService.Application.Services
         #endregion
 
         #region GetMoviesByIdAsync
-        /// <summary>
-        /// Retrieves a specific movie by its unique identifier.
-        /// </summary>
-        /// <param name="id">The movie identifier.</param>
-        /// <returns>The matching movie entity, or null if not found.</returns>
-        public async Task<Movies?> GetMoviesByIdAsync(int id)
+        /// <inheritdoc/>
+        public async Task<Movies?> GetMoviesByIdAsync(Guid id)
         {
             return await _moviesRepository.GetMoviesByIdAsync(id);
         }
         #endregion
 
         #region UpdateMoviesAsync
-        /// <summary>
-        /// Updates an existing movie record, refreshing its details and handling new poster uploads if provided.
-        /// </summary>
-        /// <param name="id">The movie identifier.</param>
-        /// <param name="dto">The update payload.</param>
-        /// <returns>True if the update was successful; otherwise, false.</returns>
-        public async Task<bool> UpdateMoviesAsync(int id, MovieCreateUpdateDto dto)
+        /// <inheritdoc/>
+        public async Task<Movies?> UpdateMoviesAsync(Guid id, MovieCreateUpdateDto dto)
         {
             var movie = await _moviesRepository.GetMoviesByIdAsync(id);
             if (movie == null)
-                return false;
+                return null;
 
             if (dto.File != null)
             {
@@ -126,6 +144,44 @@ namespace MoviesService.Application.Services
             movie.Modified = DateTime.Now;
 
             return await _moviesRepository.UpdateMoviesAsync(movie);
+        }
+        #endregion
+
+        #region GetMoviePosterAsync
+        /// <inheritdoc/>
+        public async Task<MoviePosterResponse> GetMoviePosterAsync(GetMoviePosterRequest request)
+        {
+            var movie = await _moviesRepository.GetMoviesByIdAsync(request.MovieId);
+            if (movie == null || string.IsNullOrEmpty(movie.PosterUrl))
+            {
+                throw new KeyNotFoundException("Movie or poster image not found.");
+            }
+
+            // Normalize slashes and trim leading slashes
+            var relativePath = movie.PosterUrl.TrimStart('/', '\\').Replace('/', Path.DirectorySeparatorChar);
+
+            // Point directly to the wwwroot folder where static files are stored
+            var filePath = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", relativePath));
+
+            if (!File.Exists(filePath))
+            {
+                throw new KeyNotFoundException($"Poster file does not exist on disk at path: {filePath}");
+            }
+
+            var fileBytes = await File.ReadAllBytesAsync(filePath);
+            var extension = Path.GetExtension(filePath).ToLowerInvariant();
+            var contentType = extension switch
+            {
+                ".png" => "image/png",
+                ".webp" => "image/webp",
+                _ => "image/jpeg"
+            };
+
+            return new MoviePosterResponse
+            {
+                FileBytes = fileBytes,
+                ContentType = contentType
+            };
         }
         #endregion
     }

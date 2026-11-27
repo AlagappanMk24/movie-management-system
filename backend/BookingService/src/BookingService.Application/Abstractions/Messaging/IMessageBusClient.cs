@@ -1,4 +1,4 @@
-﻿using BookingService.Application.DTOs.Events;
+﻿using Shared.Contracts.Events;
 
 namespace BookingService.Application.Abstractions.Messaging
 {

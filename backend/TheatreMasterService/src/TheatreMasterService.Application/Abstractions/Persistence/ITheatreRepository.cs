@@ -11,15 +11,15 @@ namespace TheatreMasterService.Application.Abstractions.Persistence
         Task<IEnumerable<Theatre>> GetTheatresAsync();
 
         /// <summary>Retrieves a theatre by its unique identifier.</summary>
-        Task<Theatre?> GetTheatreByIdAsync(int id);
+        Task<Theatre?> GetTheatreByIdAsync(Guid id);
 
         /// <summary>Creates a new theatre record.</summary>
         Task<Theatre> CreateTheatreAsync(Theatre theatre);
 
         /// <summary>Updates an existing theatre record.</summary>
-        Task<bool> UpdateTheatreAsync(Theatre theatre);
+        Task<Theatre?> UpdateTheatreAsync(Theatre theatre);
 
         /// <summary>Deletes a theatre record by identifier.</summary>
-        Task<bool> DeleteTheatreAsync(int id);
+        Task<bool> DeleteTheatreAsync(Guid id);
     }
 }

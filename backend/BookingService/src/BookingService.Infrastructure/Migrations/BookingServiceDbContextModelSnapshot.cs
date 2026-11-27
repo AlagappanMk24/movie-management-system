@@ -24,41 +24,101 @@ namespace BookingService.Infrastructure.Migrations
 
             modelBuilder.Entity("BookingService.Domain.Entities.Booking", b =>
                 {
-                    b.Property<int>("BookingId")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BookingId"));
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
 
                     b.Property<DateTime>("Modified")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("PaymentMethod")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("PaymentStatus")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<int>("SeatCount")
                         .HasColumnType("int");
 
-                    b.Property<int>("ShowId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("ShowId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("TotalAmount")
                         .HasColumnType("int");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.HasKey("BookingId");
+                    b.HasKey("Id");
+
+                    b.HasIndex("ShowId")
+                        .HasDatabaseName("IX_Bookings_ShowId");
+
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("IX_Bookings_UserId");
 
                     b.ToTable("Bookings");
+                });
+
+            modelBuilder.Entity("BookingService.Domain.Entities.BookingSeat", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("BookingId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("Modified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Price")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SeatNo")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<Guid>("ShowId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BookingId")
+                        .HasDatabaseName("IX_BookingSeats_BookingId");
+
+                    b.HasIndex("ShowId", "SeatNo")
+                        .IsUnique()
+                        .HasDatabaseName("UQ_BookingSeats_Show_Seat_Active")
+                        .HasFilter("[IsDeleted] = 0");
+
+                    b.ToTable("BookingSeats");
+                });
+
+            modelBuilder.Entity("BookingService.Domain.Entities.BookingSeat", b =>
+                {
+                    b.HasOne("BookingService.Domain.Entities.Booking", null)
+                        .WithMany()
+                        .HasForeignKey("BookingId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

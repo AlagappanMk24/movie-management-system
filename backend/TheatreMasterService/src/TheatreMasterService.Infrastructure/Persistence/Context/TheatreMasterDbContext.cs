@@ -25,10 +25,11 @@ namespace TheatreMasterService.Infrastructure.Persistence.Context
             // =========================
             modelBuilder.Entity<Theatre>(entity =>
             {
-                entity.HasKey(t => t.TheatreId);
+                entity.HasKey(t => t.Id);
 
                 entity.HasIndex(t => t.TheatreName)
-                      .IsUnique();
+                      .IsUnique()
+                      .HasFilter("[IsDeleted] = 0");
 
                 entity.HasMany(t => t.Screens)
                       .WithOne(s => s.Theatre)
@@ -41,11 +42,12 @@ namespace TheatreMasterService.Infrastructure.Persistence.Context
             // =========================
             modelBuilder.Entity<Screen>(entity =>
             {
-                entity.HasKey(s => s.ScreenId);
+                entity.HasKey(s => s.Id);
 
-                // One Theatre → Many Screens
+                // One Theatre -> Many Screens (unique per active screen)
                 entity.HasIndex(s => new { s.TheatreId, s.ScreenName })
-                      .IsUnique();
+                      .IsUnique()
+                      .HasFilter("[IsDeleted] = 0");
 
                 entity.HasMany(s => s.Shows)
                       .WithOne(sh => sh.Screen)
@@ -58,7 +60,7 @@ namespace TheatreMasterService.Infrastructure.Persistence.Context
             // =========================
             modelBuilder.Entity<Show>(entity =>
             {
-                entity.HasKey(s => s.ShowId);
+                entity.HasKey(s => s.Id);
 
                 // Prevent duplicate shows
                 entity.HasIndex(s => new

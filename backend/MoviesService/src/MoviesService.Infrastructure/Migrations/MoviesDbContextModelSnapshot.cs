@@ -24,11 +24,9 @@ namespace MoviesService.Infrastructure.Migrations
 
             modelBuilder.Entity("MoviesService.Domain.Entities.Movies", b =>
                 {
-                    b.Property<int>("MovieId")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MovieId"));
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Actor")
                         .IsRequired()
@@ -56,6 +54,9 @@ namespace MoviesService.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Language")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -76,7 +77,7 @@ namespace MoviesService.Infrastructure.Migrations
                     b.Property<string>("TrailerUrl")
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("MovieId");
+                    b.HasKey("Id");
 
                     b.HasIndex("Title");
 

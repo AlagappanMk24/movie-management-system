@@ -1,7 +1,7 @@
 using FluentValidation.AspNetCore;
-using MovieService.Infrastructure.Extensions;
 using MoviesService.Api.Extensions;
 using MoviesService.Application.Extensions;
+using MoviesService.Infrastructure.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 

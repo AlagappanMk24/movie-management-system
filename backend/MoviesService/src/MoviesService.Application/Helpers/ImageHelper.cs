@@ -21,6 +21,12 @@ namespace MoviesService.Application.Helpers
             if (file == null || file.Length == 0)
                 return null;
 
+            // Ensure WebRootPath is initialized
+            if (string.IsNullOrEmpty(_env.WebRootPath))
+            {
+                _env.WebRootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+            }
+
             var path = Path.Combine(_env.WebRootPath, folder);
 
             if (!Directory.Exists(path))
@@ -29,12 +35,12 @@ namespace MoviesService.Application.Helpers
             var fileName = Guid.NewGuid() + Path.GetExtension(file.FileName);
             var fullPath = Path.Combine(path, fileName);
 
-            using (var stream = new FileStream(fullPath, FileMode.Create))
+            using (var stream = new FileStream(fullPath, FileMode.Create, FileAccess.Write, FileShare.Read))
             {
                 file.CopyTo(stream);
             }
 
-            return $"/{folder}/{fileName}";
+            return $"/{folder}/{fileName}".Replace("\\", "/");
         }
     }
 }

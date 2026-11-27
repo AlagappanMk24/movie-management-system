@@ -3,9 +3,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using UserService.Application.Abstractions;
 using UserService.Application.Abstractions.Persistence;
-using UserService.Infrastructure.Messaging;
 using UserService.Infrastructure.Persistence.Context;
-using UserService.Infrastructure.Repositories;
+using UserService.Infrastructure.Persistence.Repositories;
 using UserService.Infrastructure.Services;
 using UserService.Infrastructure.Services.Security;
 
@@ -32,8 +31,6 @@ namespace UserService.Infrastructure.Extensions
             services.AddScoped<IUserRepository, UserRepository>();
 
             services.AddHttpClient<IMicroServiceGateway, MicroServiceGateway>();
-
-            services.AddHostedService<RabbitMQSubscriber>();
 
             services.AddMemoryCache();
 

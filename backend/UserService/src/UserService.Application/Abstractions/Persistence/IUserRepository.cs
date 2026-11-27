@@ -11,7 +11,7 @@ namespace UserService.Application.Abstractions.Persistence
         Task<IEnumerable<User>> GetUserAsync();
 
         /// <summary>Retrieves a user by ID.</summary>
-        Task<User> GetUserByIdAsync(int id);
+        Task<User> GetUserByIdAsync(Guid id);
 
         /// <summary>Creates a new user in the database.</summary>
         Task<User> CreateUserAsync(User user);
@@ -20,7 +20,7 @@ namespace UserService.Application.Abstractions.Persistence
         Task<bool> UpdateUserAsync(User user);
 
         /// <summary>Deletes a user by ID.</summary>
-        Task<bool> DeleteUserAsync(int id);
+        Task<bool> DeleteUserAsync(Guid id);
 
         /// <summary>Retrieves a user by email address.</summary>
         Task<User?> GetByEmailAsync(string email);

@@ -5,6 +5,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Shared.Contracts\Shared.Contracts.csproj" />
     <ProjectReference Include="..\ReviewService.Domain\ReviewService.Domain.csproj" />
   </ItemGroup>
 

@@ -12,7 +12,7 @@ namespace EmailService.Infrastructure.Services
         private readonly IConfiguration _configuration = configuration;
 
         /// <inheritdoc />
-        public async Task<byte[]> DownloadTicketAsync(int bookingId)
+        public async Task<byte[]> DownloadTicketAsync(Guid bookingId)
         {
             var baseUrl = _configuration["MicroServiceUrls:BookingService"];
             var response = await _httpClient.GetAsync($"{baseUrl}/api/booking/download/{bookingId}");
@@ -22,10 +22,10 @@ namespace EmailService.Infrastructure.Services
         }
 
         /// <inheritdoc />
-        public async Task<string> GetUserEmailAsync(int userId)
+        public async Task<string> GetUserEmailAsync(Guid userId)
         {
             var baseUrl = _configuration["MicroServiceUrls:UserService"];
-            var url = $"{baseUrl}/api/user/GetUserById/{userId}";
+            var url = $"{baseUrl}/api/user/{userId}";
 
             var user = await _httpClient.GetFromJsonAsync<UserDto>(url);
             return user?.Email ?? throw new InvalidOperationException($"User email not found for ID {userId}");

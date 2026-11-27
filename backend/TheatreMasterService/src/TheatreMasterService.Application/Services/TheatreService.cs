@@ -1,5 +1,6 @@
 ﻿using TheatreMasterService.Application.Abstractions.Persistence;
 using TheatreMasterService.Application.Abstractions.Services;
+using TheatreMasterService.Application.DTOs.Request;
 using TheatreMasterService.Domain.Entities;
 
 namespace TheatreMasterService.Application.Services
@@ -12,19 +13,31 @@ namespace TheatreMasterService.Application.Services
         #endregion
 
         /// <inheritdoc />
-        public async Task<Theatre> CreateTheatreAsync(Theatre theatre)
+        public async Task<Theatre> CreateTheatreAsync(TheatreCreateUpdateDto dto)
         {
+            var theatre = new Theatre
+            {
+                Id = Guid.NewGuid(),
+                TheatreName = dto.TheatreName,
+                City = dto.City,
+                Address = dto.Address,
+                PhoneNumber = dto.PhoneNumber,
+                Created = DateTime.UtcNow,
+                Modified = DateTime.UtcNow,
+                IsDeleted = false
+            };
+
             return await _theatreRepository.CreateTheatreAsync(theatre);
         }
 
         /// <inheritdoc />
-        public async Task<bool> DeleteTheatreAsync(int id)
+        public async Task<bool> DeleteTheatreAsync(Guid id)
         {
             return await _theatreRepository.DeleteTheatreAsync(id);
         }
 
         /// <inheritdoc />
-        public async Task<Theatre?> GetTheatreByIdAsync(int id)
+        public async Task<Theatre?> GetTheatreByIdAsync(Guid id)
         {
             return await _theatreRepository.GetTheatreByIdAsync(id);
         }
@@ -36,13 +49,18 @@ namespace TheatreMasterService.Application.Services
         }
 
         /// <inheritdoc />
-        public async Task<bool> UpdateTheatreAsync(int id, Theatre theatre)
+        public async Task<Theatre?> UpdateTheatreAsync(Guid id, TheatreCreateUpdateDto dto)
         {
             var existingTheatre = await _theatreRepository.GetTheatreByIdAsync(id);
             if (existingTheatre == null)
-                return false;
-            existingTheatre.TheatreName = theatre.TheatreName;
-            existingTheatre.City = theatre.City;
+                return null;
+
+            existingTheatre.TheatreName = dto.TheatreName;
+            existingTheatre.City = dto.City;
+            existingTheatre.Address = dto.Address;
+            existingTheatre.PhoneNumber = dto.PhoneNumber;
+            existingTheatre.Modified = DateTime.UtcNow;
+
             return await _theatreRepository.UpdateTheatreAsync(existingTheatre);
         }
     }

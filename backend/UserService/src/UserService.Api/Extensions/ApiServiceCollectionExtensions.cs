@@ -4,6 +4,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using System.Security.Claims;
 using System.Text;
+using UserService.Api.Consumers;
 using UserService.Api.Routing;
 
 namespace UserService.Api.Extensions
@@ -82,7 +83,7 @@ namespace UserService.Api.Extensions
                     };
                 });
             });
-
+            services.AddHostedService<UserBookingNotificationConsumer>();
             return services;
         }
 

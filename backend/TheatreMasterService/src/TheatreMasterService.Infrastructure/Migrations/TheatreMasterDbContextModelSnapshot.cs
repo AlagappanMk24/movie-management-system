@@ -24,17 +24,21 @@ namespace TheatreMasterService.Infrastructure.Migrations
 
             modelBuilder.Entity("TheatreMasterService.Domain.Entities.Screen", b =>
                 {
-                    b.Property<int>("ScreenId")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ScreenId"));
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime2");
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<DateTime>("Modified")
                         .HasColumnType("datetime2");
+
+                    b.Property<int>("Rows")
+                        .HasColumnType("int");
 
                     b.Property<string>("ScreenName")
                         .IsRequired()
@@ -47,39 +51,44 @@ namespace TheatreMasterService.Infrastructure.Migrations
                     b.Property<int>("SeatCapacity")
                         .HasColumnType("int");
 
-                    b.Property<int>("TheatreId")
+                    b.Property<int>("SeatsPerRow")
                         .HasColumnType("int");
 
-                    b.HasKey("ScreenId");
+                    b.Property<Guid>("TheatreId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
 
                     b.HasIndex("TheatreId", "ScreenName")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("[IsDeleted] = 0");
 
                     b.ToTable("Screens");
                 });
 
             modelBuilder.Entity("TheatreMasterService.Domain.Entities.Show", b =>
                 {
-                    b.Property<int>("ShowId")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ShowId"));
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime2");
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<DateTime>("Modified")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("MovieId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("MovieId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("Price")
                         .HasColumnType("int");
 
-                    b.Property<int>("ScreenId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("ScreenId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("ShowDate")
                         .HasColumnType("datetime2");
@@ -87,7 +96,7 @@ namespace TheatreMasterService.Infrastructure.Migrations
                     b.Property<TimeSpan>("ShowTime")
                         .HasColumnType("time");
 
-                    b.HasKey("ShowId");
+                    b.HasKey("Id");
 
                     b.HasIndex("ScreenId");
 
@@ -99,11 +108,9 @@ namespace TheatreMasterService.Infrastructure.Migrations
 
             modelBuilder.Entity("TheatreMasterService.Domain.Entities.Theatre", b =>
                 {
-                    b.Property<int>("TheatreId")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TheatreId"));
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Address")
                         .IsRequired()
@@ -116,6 +123,9 @@ namespace TheatreMasterService.Infrastructure.Migrations
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime2");
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<DateTime>("Modified")
                         .HasColumnType("datetime2");
 
@@ -127,10 +137,11 @@ namespace TheatreMasterService.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.HasKey("TheatreId");
+                    b.HasKey("Id");
 
                     b.HasIndex("TheatreName")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("[IsDeleted] = 0");
 
                     b.ToTable("Theatres");
                 });

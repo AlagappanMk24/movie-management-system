@@ -4,9 +4,37 @@
     // 1. USER & AUTHENTICATION SERVICE ROUTES
     // ==========================================
     {
-      // Authenticated User profile & management endpoints
+      "UpstreamPathTemplate": "/api/user",
+      "UpstreamHttpMethod": [ "GET", "POST" ],
+      "DownstreamPathTemplate": "/api/user",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7195
+        }
+      ],
+      "SwaggerKey": "Userservice",
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "IdentityServiceKey"
+      }
+    },
+    {
+      "UpstreamPathTemplate": "/api/user/{id}",
+      "UpstreamHttpMethod": [ "GET" ],
+      "DownstreamPathTemplate": "/api/user/{id}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7195
+        }
+      ],
+      "SwaggerKey": "Userservice"
+    },
+    {
       "UpstreamPathTemplate": "/api/user/{everything}",
-      "UpstreamHttpMethod": [ "Get", "Post", "Put", "Delete" ],
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
       "DownstreamPathTemplate": "/api/user/{everything}",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
@@ -24,7 +52,7 @@
       // Public Authentication login/register endpoints (No JWT required)
       "UpstreamPathTemplate": "/api/auth/{everything}",
       "UpstreamHttpMethod": [ "Post" ],
-      "DownstreamPathTemplate": "/api/Auth/{everything}",
+      "DownstreamPathTemplate": "/api/auth/{everything}",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
@@ -39,9 +67,45 @@
     // 2. BOOKING SERVICE ROUTES
     // ==========================================
     {
-      // Ticket booking, seat reservation, and payment coordination endpoints
+      // All bookings list (Admin role enforced in BookingController)
+      "UpstreamPathTemplate": "/api/booking",
+      "UpstreamHttpMethod": [ "GET" ],
+      "DownstreamPathTemplate": "/api/booking",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7277
+        }
+      ],
+      "SwaggerKey": "Bookingservice",
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "IdentityServiceKey"
+      }
+    },
+    {
+      // Movie-wise collection analytics
+      "UpstreamPathTemplate": "/api/booking/movie-collection",
+      "UpstreamHttpMethod": [ "GET" ],
+      "DownstreamPathTemplate": "/api/booking/movie-collection",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7277
+        }
+      ],
+      "SwaggerKey": "Bookingservice",
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "IdentityServiceKey"
+      }
+    },
+    {
+      // Booking queries, seat lookups, ticket PDF/QR downloads,
+      // booking creation (standard / with seats / bulk TVP / Excel upload),
+      // and booking cancellation / status updates
       "UpstreamPathTemplate": "/api/booking/{everything}",
-      "UpstreamHttpMethod": [ "Get", "Post", "Put", "Delete" ],
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
       "DownstreamPathTemplate": "/api/booking/{everything}",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
@@ -60,9 +124,23 @@
     // 3. MOVIE & MEDIA SERVICE ROUTES
     // ==========================================
     {
-      // Movie catalog, show timings, and details management endpoints
+      // Public movie catalog, details, and poster endpoints (No JWT required)
       "UpstreamPathTemplate": "/api/movies/{everything}",
-      "UpstreamHttpMethod": [ "Get", "Post", "Put", "Delete" ],
+      "UpstreamHttpMethod": [ "Get" ],
+      "DownstreamPathTemplate": "/api/movies/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7238
+        }
+      ],
+      "SwaggerKey": "Movieservice"
+    },
+    {
+      // Admin-only movie management mutations (JWT required)
+      "UpstreamPathTemplate": "/api/movies/{everything}",
+      "UpstreamHttpMethod": [ "Post", "Put", "Delete" ],
       "DownstreamPathTemplate": "/api/movies/{everything}",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
@@ -89,19 +167,92 @@
         }
       ],
       "SwaggerKey": "Movieservice"
-      //"AuthenticationOptions": {
-      //  "AuthenticationProviderKey": "IdentityServiceKey"
-      //}
     },
 
     // ==========================================
     // 4. THEATRE MASTER SERVICE ROUTES
     // ==========================================
     {
-      // Theatre complexes, screens, and auditoriums management endpoints
+      // Public theatre catalog and details endpoints (No JWT required)
       "UpstreamPathTemplate": "/api/theatre/{everything}",
-      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
-      "DownstreamPathTemplate": "/api/{everything}",
+      "UpstreamHttpMethod": [ "GET" ],
+      "DownstreamPathTemplate": "/api/theatre/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7293
+        }
+      ],
+      "SwaggerKey": "TheatreMasterService"
+    },
+    {
+      // Admin-only theatre management mutations (JWT required)
+      "UpstreamPathTemplate": "/api/theatre/{everything}",
+      "UpstreamHttpMethod": [ "POST", "PUT", "DELETE" ],
+      "DownstreamPathTemplate": "/api/theatre/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7293
+        }
+      ],
+      "SwaggerKey": "TheatreMasterService",
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "IdentityServiceKey"
+      }
+    },
+    {
+      // Public screen catalog and details endpoints (No JWT required)
+      "UpstreamPathTemplate": "/api/screen/{everything}",
+      "UpstreamHttpMethod": [ "GET" ],
+      "DownstreamPathTemplate": "/api/screen/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7293
+        }
+      ],
+      "SwaggerKey": "TheatreMasterService"
+    },
+    {
+      // Admin-only screen management mutations (JWT required)
+      "UpstreamPathTemplate": "/api/screen/{everything}",
+      "UpstreamHttpMethod": [ "POST", "PUT", "DELETE" ],
+      "DownstreamPathTemplate": "/api/screen/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7293
+        }
+      ],
+      "SwaggerKey": "TheatreMasterService",
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "IdentityServiceKey"
+      }
+    },
+    {
+      // Public show schedules, movie shows, and seat availability endpoints (No JWT required)
+      "UpstreamPathTemplate": "/api/show/{everything}",
+      "UpstreamHttpMethod": [ "GET" ],
+      "DownstreamPathTemplate": "/api/show/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7293
+        }
+      ],
+      "SwaggerKey": "TheatreMasterService"
+    },
+    {
+      // Admin-only show schedule management mutations (JWT required)
+      "UpstreamPathTemplate": "/api/show/{everything}",
+      "UpstreamHttpMethod": [ "POST", "PUT", "DELETE" ],
+      "DownstreamPathTemplate": "/api/show/{everything}",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
@@ -122,7 +273,7 @@
       // User movie reviews and ratings management endpoints
       "UpstreamPathTemplate": "/api/review/{everything}",
       "UpstreamHttpMethod": [ "Get", "Post", "Put", "Delete" ],
-      "DownstreamPathTemplate": "/api/Review/{everything}",
+      "DownstreamPathTemplate": "/api/review/{everything}",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
@@ -167,7 +318,7 @@
         {
           "Name": "User Service API",
           "Version": "v1",
-          "Url": "https://localhost:7255/swagger/v1/swagger.json"
+          "Url": "https://localhost:7195/swagger/v1/swagger.json"
         }
       ]
     },

@@ -11,12 +11,12 @@ namespace ReviewService.Application.Abstractions.Services
         /// <summary>Creates a new review for a movie.</summary>
         /// <param name="dto">The creation payload containing review details.</param>
         /// <param name="userId">The identifier of the user creating the review.</param>
-        Task CreateReviewAsync(CreateReviewDto dto, int userId);
+        Task CreateReviewAsync(CreateReviewDto dto, Guid userId);
 
         /// <summary>Retrieves all reviews for a specific movie.</summary>
         /// <param name="movieId">The movie identifier.</param>
         /// <returns>A collection of reviews.</returns>
-        Task<IEnumerable<Review>> GetReviewsByMovieAsync(int movieId);
+        Task<IEnumerable<Review>> GetReviewsByMovieAsync(Guid movieId);
 
         /// <summary>Retrieves all system reviews.</summary>
         /// <returns>A collection of all reviews.</returns>
@@ -26,6 +26,6 @@ namespace ReviewService.Application.Abstractions.Services
         /// <param name="reviewId">The review identifier.</param>
         /// <param name="dto">The update payload.</param>
         /// <param name="userId">The identifier of the user performing the update.</param>
-        Task UpdateReviewAsync(int reviewId, UpdateReviewDto dto, int userId);
+        Task UpdateReviewAsync(Guid reviewId, UpdateReviewDto dto, Guid userId);
     }
 }

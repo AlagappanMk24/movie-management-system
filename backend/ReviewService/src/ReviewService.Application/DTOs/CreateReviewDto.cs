@@ -8,7 +8,7 @@ namespace ReviewService.Application.DTOs
     public class CreateReviewDto
     {
         /// <summary>Gets or sets the unique identifier of the movie being reviewed.</summary>
-        public int MovieId { get; set; }
+        public Guid MovieId { get; set; }
 
         /// <summary>Gets or sets the categorical classification of the review.</summary>
         public ReviewCategory Category { get; set; }

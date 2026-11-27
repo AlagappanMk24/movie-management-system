@@ -6,10 +6,10 @@
     public class CreateBookingWithSeatsRequest
     {
         /// <summary>Gets or sets the show identifier.</summary>
-        public int ShowId { get; set; }
+        public Guid ShowId { get; set; }
 
         /// <summary>Gets or sets the user identifier making the booking.</summary>
-        public int UserId { get; set; }
+        public Guid UserId { get; set; }
 
         /// <summary>Gets or sets the list of seat numbers to reserve.</summary>
         public List<string> SeatNos { get; set; } = [];

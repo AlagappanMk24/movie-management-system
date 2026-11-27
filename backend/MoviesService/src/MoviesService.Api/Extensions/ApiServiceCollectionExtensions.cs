@@ -5,6 +5,7 @@ using Microsoft.OpenApi;
 using MoviesService.Api.Routing;
 using System.Security.Claims;
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace MoviesService.Api.Extensions
 {
@@ -21,7 +22,15 @@ namespace MoviesService.Api.Extensions
             services.AddControllers(options =>
             {
                 options.Conventions.Add(new RouteTokenTransformerConvention(new KebabCaseTransformer()));
-            });
+            })
+                .AddJsonOptions(options =>
+                {
+                    // Automatically convert C# PascalCase properties to JSON camelCase
+                    options.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
+
+                    // Optional: Ignore null values to keep responses clean
+                    options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+                });
             return services;
         }
 

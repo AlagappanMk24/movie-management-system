@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Shared.Contracts\Shared.Contracts.csproj" />
     <ProjectReference Include="..\BookingService.Domain\BookingService.Domain.csproj" />
   </ItemGroup>
 

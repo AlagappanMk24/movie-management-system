@@ -1,4 +1,5 @@
-﻿using MoviesService.Application.DTOs;
+﻿using MoviesService.Application.DTOs.Request;
+using MoviesService.Application.DTOs.Response;
 using MoviesService.Domain.Entities;
 
 namespace MoviesService.Application.Abstractions
@@ -19,7 +20,7 @@ namespace MoviesService.Application.Abstractions
         /// </summary>
         /// <param name="id">The movie identifier.</param>
         /// <returns>The matching movie entity, or null if not found.</returns>
-        Task<Movies?> GetMoviesByIdAsync(int id);
+        Task<Movies?> GetMoviesByIdAsync(Guid id);
 
         /// <summary>
         /// Creates a new movie from the provided DTO, including file upload processing if applicable.
@@ -33,14 +34,22 @@ namespace MoviesService.Application.Abstractions
         /// </summary>
         /// <param name="id">The identifier of the movie to update.</param>
         /// <param name="dto">The updated movie details.</param>
-        /// <returns>True if the update succeeded; otherwise, false.</returns>
-        Task<bool> UpdateMoviesAsync(int id, MovieCreateUpdateDto dto);
+        /// <returns>The updated movie entity, or null if not found.</returns>
+        Task<Movies?> UpdateMoviesAsync(Guid id, MovieCreateUpdateDto dto);
 
         /// <summary>
         /// Deletes a movie by its identifier after verifying no active shows or bookings depend on it.
         /// </summary>
         /// <param name="id">The identifier of the movie to delete.</param>
         /// <returns>True if deletion succeeded; otherwise, false.</returns>
-        Task<bool> DeleteMoviesAsync(int id);
+        Task<bool> DeleteMoviesAsync(Guid id);
+
+        /// <summary>
+        /// Retrieves the movie poster file bytes and content type based on the request DTO.
+        /// </summary>
+        /// <param name="request">The get movie poster request containing the MovieId.</param>
+        /// <returns>A <see cref="MoviePosterResponse"/> containing file bytes and content type.</returns>
+        /// <exception cref="KeyNotFoundException">Thrown if the movie or poster file does not exist.</exception>
+        Task<MoviePosterResponse> GetMoviePosterAsync(GetMoviePosterRequest request);
     }
 }

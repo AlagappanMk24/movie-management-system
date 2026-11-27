@@ -42,13 +42,18 @@ public class AuthController(
 
             return Ok(new
             {
-                token,
-                user = new
+                success = true,
+                message = "Login successful.",
+                data = new
                 {
-                    user.UserId,
-                    user.UserName,
-                    user.Email,
-                    user.Role
+                    token,
+                    user = new
+                    {
+                        user.Id,
+                        user.UserName,
+                        user.Email,
+                        user.Role
+                    }
                 }
             });
         }
@@ -76,14 +81,19 @@ public class AuthController(
                 return BadRequest(new { message = "User with this email already exists." });
             }
 
-            return Ok(new
+            return StatusCode(StatusCodes.Status201Created, new
             {
-                user = new
+                success = true,
+                message = "User registered successfully.",
+                data = new
                 {
-                    user.UserId,
-                    user.UserName,
-                    user.Email,
-                    user.Role
+                    user = new
+                    {
+                        user.Id,
+                        user.UserName,
+                        user.Email,
+                        user.Role
+                    }
                 }
             });
         }

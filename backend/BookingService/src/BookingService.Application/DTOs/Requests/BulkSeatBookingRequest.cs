@@ -6,10 +6,10 @@
     public class BulkSeatBookingRequest
     {
         /// <summary>Gets or sets the booking identifier.</summary>
-        public int BookingId { get; set; }
+        public Guid BookingId { get; set; }
 
         /// <summary>Gets or sets the show identifier.</summary>
-        public int ShowId { get; set; }
+        public Guid ShowId { get; set; }
 
         /// <summary>Gets or sets the list of seat numbers to reserve.</summary>
         public List<string> SeatNos { get; set; } = [];

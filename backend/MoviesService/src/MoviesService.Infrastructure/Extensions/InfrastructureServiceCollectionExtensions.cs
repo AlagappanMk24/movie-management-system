@@ -4,10 +4,10 @@ using Microsoft.Extensions.DependencyInjection;
 using MoviesService.Application.Abstractions.Persistence;
 using MoviesService.Application.Helpers;
 using MoviesService.Infrastructure.Persistence.Context;
-using MoviesService.Infrastructure.Repositories;
+using MoviesService.Infrastructure.Persistence.Repositories;
 using MoviesService.Infrastructure.Services;
 
-namespace MovieService.Infrastructure.Extensions
+namespace MoviesService.Infrastructure.Extensions
 {
     /// <summary>
     /// Provides extension methods for registering infrastructure-layer persistence, repositories, gateways, and helpers.

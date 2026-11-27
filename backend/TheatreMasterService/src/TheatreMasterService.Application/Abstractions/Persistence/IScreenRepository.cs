@@ -11,15 +11,15 @@ namespace TheatreMasterService.Application.Abstractions.Persistence
         Task<IEnumerable<Screen>> GetScreensAsync();
 
         /// <summary>Retrieves a screen by its unique identifier.</summary>
-        Task<Screen?> GetScreenByIdAsync(int id);
+        Task<Screen?> GetScreenByIdAsync(Guid id);
 
         /// <summary>Creates a new screen record.</summary>
         Task<Screen> CreateScreenAsync(Screen screen);
 
         /// <summary>Updates an existing screen record.</summary>
-        Task<bool> UpdateScreenAsync(Screen screen);
+        Task<Screen?> UpdateScreenAsync(Screen screen);
 
         /// <summary>Deletes a screen record by identifier.</summary>
-        Task<bool> DeleteScreenAsync(int id);
+        Task<bool> DeleteScreenAsync(Guid id);
     }
 }

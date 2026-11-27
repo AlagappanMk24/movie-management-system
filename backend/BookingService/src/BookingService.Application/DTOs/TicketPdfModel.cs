@@ -6,7 +6,7 @@
     public class TicketPdfModel
     {
         /// <summary>Gets or sets the booking identifier.</summary>
-        public int BookingId { get; set; }
+        public Guid BookingId { get; set; }
 
         /// <summary>Gets or sets the movie title.</summary>
         public string MovieName { get; set; } = string.Empty;

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TheatreMasterService.Application.Abstractions.Services;
+using TheatreMasterService.Application.DTOs.Request;
 using TheatreMasterService.Domain.Entities;
 
 namespace TheatreMasterService.Api.Controllers
@@ -8,7 +9,7 @@ namespace TheatreMasterService.Api.Controllers
     /// <summary>
     /// Manages API endpoints for theatre complex operations, locations, and details.
     /// </summary>
-    [Route("/api/[controller]/")]
+    [Route("/api/[controller]")]
     [ApiController]
     public class TheatreController(ITheatreService theatreService, ILogger<TheatreController> logger) : ControllerBase
     {
@@ -27,12 +28,60 @@ namespace TheatreMasterService.Api.Controllers
             try
             {
                 var theatres = await _theatreservice.GetTheatresAsync();
-                return Ok(theatres);
+                return Ok(new
+                {
+                    success = true,
+                    message = "Theatres retrieved successfully.",
+                    data = theatres
+                });
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while retrieving all theatres.");
-                return StatusCode(StatusCodes.Status500InternalServerError, "An internal server error occurred.");
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    success = false,
+                    message = "An error occurred while retrieving theatres.",
+                    details = ex.Message
+                });
+            }
+        }
+
+        /// <summary>
+        /// Retrieves a specific theatre by identifier.
+        /// </summary>
+        /// <param name="id">The theatre identifier.</param>
+        /// <returns>The matching theatre object.</returns>
+        [HttpGet("{id}")]
+        [ProducesResponseType(typeof(Theatre), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> GetTheatreById(Guid id)
+        {
+            try
+            {
+                var theatre = await _theatreservice.GetTheatreByIdAsync(id);
+                if (theatre == null)
+                {
+                    return NotFound(new { success = false, message = $"Theatre with ID {id} was not found." });
+                }
+
+                return Ok(new
+                {
+                    success = true,
+                    message = "Theatre retrieved successfully.",
+                    data = theatre
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while retrieving theatre with ID {TheatreId}.", id);
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    success = false,
+                    message = "An error occurred while retrieving the theatre.",
+                    details = ex.Message
+                });
             }
         }
 
@@ -47,49 +96,32 @@ namespace TheatreMasterService.Api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> AddTheatre([FromBody] Theatre theatre)
+        public async Task<IActionResult> AddTheatre([FromBody] TheatreCreateUpdateDto dto)
         {
             try
             {
                 if (!ModelState.IsValid)
                 {
-                    return BadRequest(ModelState);
+                    return BadRequest(new { success = false, message = "Validation failed.", errors = ModelState });
                 }
 
-                var createdTheatre = await _theatreservice.CreateTheatreAsync(theatre);
-                return CreatedAtAction(nameof(GetTheatreById), new { id = createdTheatre.TheatreId }, createdTheatre);
+                var createdTheatre = await _theatreservice.CreateTheatreAsync(dto);
+                return CreatedAtAction(nameof(GetTheatreById), new { id = createdTheatre.Id }, new
+                {
+                    success = true,
+                    message = "Theatre created successfully.",
+                    data = createdTheatre
+                });
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while creating a new theatre.");
-                return StatusCode(StatusCodes.Status500InternalServerError, "An internal server error occurred.");
-            }
-        }
-
-        /// <summary>
-        /// Retrieves a specific theatre by identifier.
-        /// </summary>
-        /// <param name="id">The theatre identifier.</param>
-        /// <returns>The matching theatre object.</returns>
-        [HttpGet("{id}")]
-        [ProducesResponseType(typeof(Theatre), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetTheatreById(int id)
-        {
-            try
-            {
-                var theatre = await _theatreservice.GetTheatreByIdAsync(id);
-                if (theatre == null)
+                return StatusCode(StatusCodes.Status500InternalServerError, new
                 {
-                    return NotFound($"Theatre with ID {id} was not found.");
-                }
-                return Ok(theatre);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "An error occurred while retrieving theatre with ID {TheatreId}.", id);
-                return StatusCode(StatusCodes.Status500InternalServerError, "An internal server error occurred.");
+                    success = false,
+                    message = "An error occurred while creating the theatre.",
+                    details = ex.Message
+                });
             }
         }
 
@@ -106,21 +138,37 @@ namespace TheatreMasterService.Api.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> UpdateTheatre(int id, [FromBody] Theatre theatre)
+        public async Task<IActionResult> UpdateTheatre(Guid id, [FromBody] TheatreCreateUpdateDto dto)
         {
             try
             {
-                var result = await _theatreservice.UpdateTheatreAsync(id, theatre);
-                if (!result)
+                if (!ModelState.IsValid)
                 {
-                    return NotFound($"Theatre with ID {id} was not found for update.");
+                    return BadRequest(new { success = false, message = "Validation failed.", errors = ModelState });
                 }
-                return Ok(result);
+
+                var updatedTheatre = await _theatreservice.UpdateTheatreAsync(id, dto);
+                if (updatedTheatre == null)
+                {
+                    return NotFound(new { success = false, message = $"Theatre with ID {id} was not found for update." });
+                }
+
+                return Ok(new
+                {
+                    success = true,
+                    message = "Theatre updated successfully.",
+                    data = updatedTheatre
+                });
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while updating theatre with ID {TheatreId}.", id);
-                return StatusCode(StatusCodes.Status500InternalServerError, "An internal server error occurred.");
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    success = false,
+                    message = "An error occurred while updating the theatre.",
+                    details = ex.Message
+                });
             }
         }
 
@@ -135,21 +183,31 @@ namespace TheatreMasterService.Api.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> DeleteTheatre(int id)
+        public async Task<IActionResult> DeleteTheatre(Guid id)
         {
             try
             {
                 var result = await _theatreservice.DeleteTheatreAsync(id);
                 if (!result)
                 {
-                    return NotFound($"Theatre with ID {id} was not found for deletion.");
+                    return NotFound(new { success = false, message = $"Theatre with ID {id} was not found for deletion." });
                 }
-                return Ok(result);
+
+                return Ok(new
+                {
+                    success = true,
+                    message = "Theatre deleted successfully."
+                });
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while deleting theatre with ID {TheatreId}.", id);
-                return StatusCode(StatusCodes.Status500InternalServerError, "An internal server error occurred.");
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    success = false,
+                    message = "An error occurred while deleting the theatre.",
+                    details = ex.Message
+                });
             }
         }
     }

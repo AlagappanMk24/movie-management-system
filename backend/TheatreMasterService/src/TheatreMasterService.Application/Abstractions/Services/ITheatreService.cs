@@ -1,4 +1,5 @@
-﻿using TheatreMasterService.Domain.Entities;
+﻿using TheatreMasterService.Application.DTOs.Request;
+using TheatreMasterService.Domain.Entities;
 
 namespace TheatreMasterService.Application.Abstractions.Services
 {
@@ -14,22 +15,22 @@ namespace TheatreMasterService.Application.Abstractions.Services
         /// <summary>Retrieves a specific theatre by its identifier.</summary>
         /// <param name="id">The theatre identifier.</param>
         /// <returns>The matching theatre object, or null if not found.</returns>
-        Task<Theatre?> GetTheatreByIdAsync(int id);
+        Task<Theatre?> GetTheatreByIdAsync(Guid id);
 
         /// <summary>Creates a new theatre complex record.</summary>
-        /// <param name="theatre">The theatre entity to create.</param>
+        /// <param name="dto">The DTO containing the theatre details to create.</param>
         /// <returns>The created theatre entity.</returns>
-        Task<Theatre> CreateTheatreAsync(Theatre theatre);
+        Task<Theatre> CreateTheatreAsync(TheatreCreateUpdateDto dto);
 
         /// <summary>Updates an existing theatre complex.</summary>
         /// <param name="id">The theatre identifier.</param>
-        /// <param name="theatre">The updated theatre payload.</param>
+        /// <param name="dto">The DTO containing the updated theatre details.</param>
         /// <returns>True if update was successful; otherwise, false.</returns>
-        Task<bool> UpdateTheatreAsync(int id, Theatre theatre);
+        Task<Theatre?> UpdateTheatreAsync(Guid id, TheatreCreateUpdateDto dto);
 
         /// <summary>Deletes a theatre complex by identifier.</summary>
         /// <param name="id">The theatre identifier.</param>
         /// <returns>True if deletion was successful; otherwise, false.</returns>
-        Task<bool> DeleteTheatreAsync(int id);
+        Task<bool> DeleteTheatreAsync(Guid id);
     }
 }

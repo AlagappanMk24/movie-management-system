@@ -1,4 +1,4 @@
-﻿using EmailService.Application.DTOs.Events;
+﻿using Shared.Contracts.Events;
 
 namespace EmailService.Application.Abstractions.Messaging
 {

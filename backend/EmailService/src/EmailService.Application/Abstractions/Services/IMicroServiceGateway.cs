@@ -6,9 +6,9 @@
     public interface IMicroServiceGateway
     {
         /// <summary>Downloads the generated PDF ticket binary from the booking service.</summary>
-        Task<byte[]> DownloadTicketAsync(int bookingId);
+        Task<byte[]> DownloadTicketAsync(Guid bookingId);
 
         /// <summary>Retrieves the user's email address by their unique identifier.</summary>
-        Task<string> GetUserEmailAsync(int userId);
+        Task<string> GetUserEmailAsync(Guid userId);
     }
 }

@@ -29,7 +29,7 @@ namespace BookingService.Infrastructure.Caching
         }
 
         /// <inheritdoc />
-        public async Task<bool> TryLockSeatAsync(int showId, string seatNo, TimeSpan expiration)
+        public async Task<bool> TryLockSeatAsync(Guid showId, string seatNo, TimeSpan expiration)
         {
             string lockKey = $"lock_show_{showId}_seat_{seatNo}";
             if (await _cache.GetStringAsync(lockKey) != null)
@@ -41,5 +41,8 @@ namespace BookingService.Infrastructure.Caching
             await _cache.SetStringAsync(lockKey, "locked", options);
             return true;
         }
+
+        public async Task ReleaseSeatLockAsync(Guid showId, string seatNo)
+            => await _cache.RemoveAsync($"lock_show_{showId}_seat_{seatNo}");
     }
 }

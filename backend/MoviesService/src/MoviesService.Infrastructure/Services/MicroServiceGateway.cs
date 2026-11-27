@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using MoviesService.Application.Abstractions.Persistence;
-using System.Net.Http.Json;
+using Shared.Contracts.Common;
+using System.Text.Json;
 
 namespace MoviesService.Infrastructure.Services
 {
@@ -21,13 +22,13 @@ namespace MoviesService.Infrastructure.Services
         /// <param name="movieId">The unique identifier of the movie.</param>
         /// <returns>True if active shows exist; otherwise, false.</returns>
         /// <exception cref="InvalidOperationException">Thrown when TheatreMasterService URL is not configured.</exception>
-        public async Task<bool> HasShow(int movieId)
+        public async Task<bool> HasShow(Guid movieId)
         {
             var baseUrl = _configuration["MicroserviceUrls:TheatreMasterService"];
             if (string.IsNullOrEmpty(baseUrl))
                 throw new InvalidOperationException("TheatreMasterService URL not configured");
 
-            var url = $"{baseUrl}/api/Show/GetShowsByMovieId/movie/{movieId}";
+            var url = $"{baseUrl}/api/show/movie/{movieId}";
 
             var response = await _httpClient.GetAsync(url);
             if (!response.IsSuccessStatusCode)
@@ -37,8 +38,13 @@ namespace MoviesService.Infrastructure.Services
             if (string.IsNullOrWhiteSpace(json))
                 return false;
 
-            var shows = System.Text.Json.JsonSerializer.Deserialize<List<object>>(json);
-            return shows != null && shows.Count > 0;
+            // Deserialize directly into your standardized envelope wrapper
+            var apiResponse = JsonSerializer.Deserialize<ApiResponse<List<object>>>(
+                json,
+                new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+            );
+
+            return apiResponse != null && apiResponse.Success && apiResponse.Data != null && apiResponse.Data.Count > 0;
         }
         #endregion
 
@@ -49,7 +55,7 @@ namespace MoviesService.Infrastructure.Services
         /// <param name="movieId">The unique identifier of the movie.</param>
         /// <returns>True if active bookings exist; otherwise, false.</returns>
         /// <exception cref="InvalidOperationException">Thrown when BookingService URL is not configured.</exception>
-        public async Task<bool> HasBooking(int movieId)
+        public async Task<bool> HasBooking(Guid movieId)
         {
             var baseUrl = _configuration["MicroServiceUrls:BookingService"];
             if (string.IsNullOrEmpty(baseUrl))
@@ -57,12 +63,20 @@ namespace MoviesService.Infrastructure.Services
 
             var url = $"{baseUrl}/api/booking/movie/{movieId}";
             var response = await _httpClient.GetAsync(url);
-            if (response.IsSuccessStatusCode)
-            {
-                var bookings = await response.Content.ReadFromJsonAsync<bool>();
-                return bookings;
-            }
-            return false;
+            if (!response.IsSuccessStatusCode)
+                return false;
+
+            var json = await response.Content.ReadAsStringAsync();
+            if (string.IsNullOrWhiteSpace(json))
+                return false;
+
+            // Deserialize into your standardized envelope wrapper
+            var apiResponse = JsonSerializer.Deserialize<ApiResponse<List<object>>>(
+                json,
+                new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+            );
+
+            return apiResponse != null && apiResponse.Success && apiResponse.Data != null && apiResponse.Data.Count > 0;
         }
         #endregion
     }

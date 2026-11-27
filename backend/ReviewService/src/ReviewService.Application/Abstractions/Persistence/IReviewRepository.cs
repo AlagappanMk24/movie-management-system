@@ -11,12 +11,12 @@ namespace ReviewService.Application.Abstractions.Persistence
         /// <param name="movieId">The movie identifier.</param>
         /// <param name="userId">The user identifier.</param>
         /// <returns>The matching review object, or null if not found.</returns>
-        Task<Review?> GetByMovieAndUserAsync(int movieId, int userId);
+        Task<Review?> GetByMovieAndUserAsync(Guid movieId, Guid userId);
 
         /// <summary>Retrieves all reviews associated with a specific movie identifier.</summary>
         /// <param name="movieId">The movie identifier.</param>
         /// <returns>A collection of reviews for the movie.</returns>
-        Task<IEnumerable<Review>> GetByMovieIdAsync(int movieId);
+        Task<IEnumerable<Review>> GetByMovieIdAsync(Guid movieId);
 
         /// <summary>Adds a new review record.</summary>
         /// <param name="review">The review entity to add.</param>
@@ -33,6 +33,6 @@ namespace ReviewService.Application.Abstractions.Persistence
         /// <summary>Retrieves a specific review by its unique identifier.</summary>
         /// <param name="reviewId">The review identifier.</param>
         /// <returns>The matching review object, or null if not found.</returns>
-        Task<Review?> GetByIdAsync(int reviewId);
+        Task<Review?> GetByIdAsync(Guid reviewId);
     }
 }

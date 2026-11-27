@@ -28,22 +28,32 @@ namespace ReviewService.Api.Controllers
         [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> CreateReview([FromBody] CreateReviewDto dto, [FromQuery] int userId)
+        public async Task<IActionResult> CreateReview([FromBody] CreateReviewDto dto, [FromQuery] Guid userId)
         {
             try
             {
                 if (!ModelState.IsValid)
                 {
-                    return BadRequest(ModelState);
+                    return BadRequest(new { success = false, message = "Validation failed.", errors = ModelState });
                 }
 
                 await _reviewService.CreateReviewAsync(dto, userId);
-                return Ok("Review added successfully");
+
+                return StatusCode(StatusCodes.Status201Created, new
+                {
+                    success = true,
+                    message = "Review added successfully."
+                });
             }
-            catch (Exception ex)
+           catch (Exception ex)
             {
-                _logger.LogError(ex, "An error occurred while creating a review for Movie ID {MovieId} by User ID {UserId}.", dto.MovieId, userId);
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+                _logger.LogError(ex, "An error occurred while creating a review for Movie ID {MovieId} by User ID {UserId}.", dto?.MovieId, userId);
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    success = false,
+                    message = "An error occurred while creating the review.",
+                    details = ex.Message
+                });
             }
         }
 
@@ -56,17 +66,27 @@ namespace ReviewService.Api.Controllers
         [AllowAnonymous]
         [ProducesResponseType(typeof(IEnumerable<Review>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetReviews(int movieId)
+        public async Task<IActionResult> GetReviews(Guid movieId)
         {
             try
             {
                 var reviews = await _reviewService.GetReviewsByMovieAsync(movieId);
-                return Ok(reviews);
+                return Ok(new
+                {
+                    success = true,
+                    message = "Movie reviews retrieved successfully.",
+                    data = reviews
+                });
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while retrieving reviews for Movie ID {MovieId}.", movieId);
-                return StatusCode(StatusCodes.Status500InternalServerError, "An internal server error occurred.");
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    success = false,
+                    message = "An error occurred while retrieving movie reviews.",
+                    details = ex.Message
+                });
             }
         }
 
@@ -82,32 +102,41 @@ namespace ReviewService.Api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> UpdateReview(int reviewId, [FromBody] UpdateReviewDto dto, [FromQuery] int userId)
+        public async Task<IActionResult> UpdateReview(Guid reviewId, [FromBody] UpdateReviewDto dto, [FromQuery] Guid userId)
         {
             try
             {
                 if (!ModelState.IsValid)
                 {
-                    return BadRequest(ModelState);
+                    return BadRequest(new { success = false, message = "Validation failed.", errors = ModelState });
                 }
 
                 await _reviewService.UpdateReviewAsync(reviewId, dto, userId);
-                return Ok("Review updated successfully");
+                return Ok(new
+                {
+                    success = true,
+                    message = "Review updated successfully."
+                });
             }
             catch (KeyNotFoundException ex)
             {
                 _logger.LogWarning(ex, "Review with ID {ReviewId} was not found for update.", reviewId);
-                return NotFound(ex.Message);
+                return NotFound(new { success = false, message = ex.Message });
             }
             catch (UnauthorizedAccessException ex)
             {
                 _logger.LogWarning(ex, "User ID {UserId} is not authorized to update Review ID {ReviewId}.", userId, reviewId);
-                return Forbid(ex.Message);
+                return StatusCode(StatusCodes.Status401Unauthorized, new { success = false, message = ex.Message });
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while updating Review ID {ReviewId}.", reviewId);
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    success = false,
+                    message = "An error occurred while updating the review.",
+                    details = ex.Message
+                });
             }
         }
 
@@ -123,12 +152,22 @@ namespace ReviewService.Api.Controllers
             try
             {
                 var reviews = await _reviewService.GetAllReviewsAsync();
-                return Ok(reviews);
+                return Ok(new
+                {
+                    success = true,
+                    message = "All reviews retrieved successfully.",
+                    data = reviews
+                });
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while retrieving all reviews.");
-                return StatusCode(StatusCodes.Status500InternalServerError, "An internal server error occurred.");
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    success = false,
+                    message = "An error occurred while retrieving reviews.",
+                    details = ex.Message
+                });
             }
         }
     }

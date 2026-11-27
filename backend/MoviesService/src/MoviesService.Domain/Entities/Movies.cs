@@ -1,15 +1,12 @@
-﻿namespace MoviesService.Domain.Entities
+﻿using Shared.Contracts.Common;
+
+namespace MoviesService.Domain.Entities
 {
     /// <summary>
     /// Represents a movie domain entity containing core movie attributes and audit timestamps.
     /// </summary>
-    public class Movies
+    public class Movies : BaseEntity
     {
-        /// <summary>
-        /// Gets or sets the unique primary key identifier for the movie.
-        /// </summary>
-        public int MovieId { get; set; }
-
         /// <summary>
         /// Gets or sets the title of the movie.
         /// </summary>
@@ -64,15 +61,5 @@
         /// Gets or sets the URL link for the movie trailer.
         /// </summary>
         public string? TrailerUrl { get; set; }
-
-        /// <summary>
-        /// Gets or sets the timestamp when the movie record was created.
-        /// </summary>
-        public DateTime Created { get; set; }
-
-        /// <summary>
-        /// Gets or sets the timestamp when the movie record was last modified.
-        /// </summary>
-        public DateTime Modified { get; set; }
     }
 }

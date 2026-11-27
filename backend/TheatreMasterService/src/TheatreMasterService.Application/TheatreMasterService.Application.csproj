@@ -1,12 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Shared.Contracts\Shared.Contracts.csproj" />
     <ProjectReference Include="..\TheatreMasterService.Domain\TheatreMasterService.Domain.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="DTOs\Responses\" />
-    <Folder Include="DTOs\Requests\" />
   </ItemGroup>
 
   <ItemGroup>

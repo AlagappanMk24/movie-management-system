@@ -10,13 +10,13 @@
         /// </summary>
         /// <param name="movieId">The unique identifier of the movie.</param>
         /// <returns>True if active shows exist; otherwise, false.</returns>
-        Task<bool> HasShow(int movieId);
+        Task<bool> HasShow(Guid movieId);
 
         /// <summary>
         /// Checks whether the specified movie has any active bookings in the booking service.
         /// </summary>
         /// <param name="movieId">The unique identifier of the movie.</param>
         /// <returns>True if active bookings exist; otherwise, false.</returns>
-        Task<bool> HasBooking(int movieId);
+        Task<bool> HasBooking(Guid movieId);
     }
 }

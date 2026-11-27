@@ -5,12 +5,12 @@
     /// </summary>
     public class BookingShow
     {
-        public int ShowId { get; set; }
+        public Guid ShowId { get; set; }
         public string Title { get; set; } = string.Empty;
         public string ShowTime { get; set; } = string.Empty;
-        public int MovieId { get; set; }
+        public Guid MovieId { get; set; }
         public int Price { get; set; }
-        public int ScreenId { get; set; }
+        public Guid ScreenId { get; set; }
         public DateTime ShowDate { get; set; }
     }
 }

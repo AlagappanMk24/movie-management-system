@@ -1,5 +1,6 @@
 ﻿using BookingService.Application.DTOs.Analytics;
 using BookingService.Application.DTOs.Requests;
+using BookingService.Application.DTOs.Responses;
 using BookingService.Domain.Entities;
 
 namespace BookingService.Application.Abstractions.Services
@@ -10,59 +11,64 @@ namespace BookingService.Application.Abstractions.Services
     public interface IBookingService
     {
         /// <summary>
-        /// Bulk books and locks multiple seats for a show.
-        /// </summary>
-        Task BulkBookSeatsAsync(int bookingId, int showId, List<string> seatNos);
-
-        /// <summary>
-        /// Cancels an existing booking by identifier.
-        /// </summary>
-        Task<bool> CancelBookingAsync(int bookingId);
-
-        /// <summary>
-        /// Creates a basic booking record.
-        /// </summary>
-        Task<Booking> CreateBookingAsync(Booking booking);
-
-        /// <summary>
-        /// Creates a complete booking with seat allocations transactionally.
-        /// </summary>
-        Task<int> CreateBookingWithSeatsAsync(CreateBookingWithSeatsRequest request);
-
-        /// <summary>
-        /// Gets the count of booked seats for a show.
-        /// </summary>
-        Task<int> GetBookedSeatCountByShowAsync(int showId);
-
-        /// <summary>
-        /// Gets all seat numbers assigned to a booking.
-        /// </summary>
-        Task<List<string>> GetBookedSeatsAsync(int bookingId);
-
-        /// <summary>
         /// Retrieves all bookings.
         /// </summary>
-        Task<IEnumerable<Booking>> GetBookingAsync();
+        Task<IEnumerable<BookingResponse>> GetBookingsAsync();
 
         /// <summary>
-        /// Retrieves a booking by its identifier.
+        /// Retrieves a booking by its unique identifier.
         /// </summary>
-        Task<Booking?> GetBookingByIdAsync(int bookingId);
-
-        /// <summary>
-        /// Retrieves bookings for a specific show.
-        /// </summary>
-        Task<IEnumerable<Booking>> GetBookingByShowIdAsync(int showId);
+        Task<BookingResponse?> GetBookingByIdAsync(Guid bookingId);
 
         /// <summary>
         /// Retrieves bookings for a specific user.
         /// </summary>
-        Task<IEnumerable<Booking>> GetBookingByUserIdAsync(int userId);
+        Task<IEnumerable<BookingResponse>> GetBookingsByUserIdAsync(Guid userId);
+
+        /// <summary>
+        /// Retrieves bookings for a specific show.
+        /// </summary>
+        Task<IEnumerable<BookingResponse>> GetBookingsByShowIdAsync(Guid showId);
+
+        /// <summary>
+        /// Retrieves all bookings associated with a specific movie.
+        /// </summary>
+        Task<IEnumerable<BookingResponse>> GetBookingsByMovieIdAsync(Guid movieId);
+
+        /// <summary>
+        /// Gets the total count of booked seats for a show.
+        /// </summary>
+        Task<int> GetBookedSeatCountByShowAsync(Guid showId);
+
+        /// <summary>
+        /// Gets all seat numbers assigned to a booking.
+        /// </summary>
+        Task<List<string>> GetBookedSeatsAsync(Guid bookingId);
+
+        /// <summary>
+        /// Creates a basic booking record.
+        /// </summary>
+        Task<BookingResponse> CreateBookingAsync(CreateBookingRequest request);
+
+        /// <summary>
+        /// Creates a complete booking with seat allocations transactionally.
+        /// </summary>
+        Task<Guid> CreateBookingWithSeatsAsync(CreateBookingWithSeatsRequest request);
+
+        /// <summary>
+        /// Bulk books and locks multiple seats for a show.
+        /// </summary>
+        Task BulkBookSeatsAsync(Guid bookingId, Guid showId, List<string> seatNos);
+
+        /// <summary>
+        /// Cancels an existing booking by identifier.
+        /// </summary>
+        Task<bool> CancelBookingAsync(Guid bookingId);
 
         /// <summary>
         /// Updates the status of a booking.
         /// </summary>
-        Task<bool> UpdateBookingStatusAsync(int bookingId, string status);
+        Task<bool> UpdateBookingStatusAsync(Guid bookingId, string status);
 
         /// <summary>
         /// Calculates box-office collection revenue grouped by movie title.

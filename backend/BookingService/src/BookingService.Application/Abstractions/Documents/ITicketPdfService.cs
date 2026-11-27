@@ -10,7 +10,7 @@ namespace BookingService.Application.Abstractions.Documents
         /// <summary>
         /// Aggregates booking, show, movie, theatre, and QR code data into a ticket model.
         /// </summary>
-        Task<TicketPdfModel> BuildTicketPdfModelAsync(int bookingId);
+        Task<TicketPdfModel> BuildTicketPdfModelAsync(Guid bookingId);
 
         /// <summary>
         /// Renders a <see cref="TicketPdfModel"/> into a binary PDF file.

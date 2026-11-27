@@ -13,6 +13,8 @@
         /// <summary>
         /// Attempts to acquire a distributed lock for a specific show seat.
         /// </summary>
-        Task<bool> TryLockSeatAsync(int showId, string seatNo, TimeSpan expiration);
+        Task<bool> TryLockSeatAsync(Guid showId, string seatNo, TimeSpan expiration);
+
+        Task ReleaseSeatLockAsync(Guid showId, string seatNo);
     }
 }

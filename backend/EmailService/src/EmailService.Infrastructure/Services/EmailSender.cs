@@ -9,9 +9,9 @@ using MimeKit;
 namespace EmailService.Infrastructure.Services
 {
     /// <inheritdoc />
-    public class EmailSender(IOptions<EmailSetting> settings) : IEmailSender
+    public class EmailSender(IOptions<EmailSettings> settings) : IEmailSender
     {
-        private readonly EmailSetting _settings = settings.Value;
+        private readonly EmailSettings _settings = settings.Value;
 
         /// <inheritdoc />
         public async Task SendAsync(string to, string subject, string body, byte[] pdfBytes)

@@ -1,7 +1,7 @@
 ﻿using EmailService.Application.Abstractions.Messaging;
 using EmailService.Application.Abstractions.Services;
-using EmailService.Application.DTOs.Events;
 using Microsoft.Extensions.Logging;
+using Shared.Contracts.Events;
 
 namespace EmailService.Application.Services
 {

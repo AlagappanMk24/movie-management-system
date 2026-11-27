@@ -4,31 +4,38 @@
     "Projects": [
       {
         "Path": "Gateway.Api\\Gateway.Api.csproj",
-        "Action": "Start"
+        "Action": "Start",
+        "DebugTarget": "https"
       },
       {
         "Path": "EmailService\\src\\EmailService.Api\\EmailService.Api.csproj",
-        "Action": "Start"
+        "Action": "Start",
+        "DebugTarget": "https"
       },
       {
         "Path": "MoviesService\\src\\MoviesService.Api\\MoviesService.Api.csproj",
-        "Action": "Start"
+        "Action": "Start",
+        "DebugTarget": "https"
       },
       {
         "Path": "ReviewService\\src\\ReviewService.Api\\ReviewService.Api.csproj",
-        "Action": "Start"
+        "Action": "Start",
+        "DebugTarget": "https"
       },
       {
         "Path": "BookingService\\src\\BookingService.Api\\BookingService.Api.csproj",
-        "Action": "Start"
+        "Action": "Start",
+        "DebugTarget": "https"
       },
       {
         "Path": "TheatreMasterService\\src\\TheatreMasterService.Api\\TheatreMasterService.Api.csproj",
-        "Action": "Start"
+        "Action": "Start",
+        "DebugTarget": "https"
       },
       {
         "Path": "UserService\\src\\UserService.Api\\UserService.Api.csproj",
-        "Action": "Start"
+        "Action": "Start",
+        "DebugTarget": "https"
       }
     ]
   }

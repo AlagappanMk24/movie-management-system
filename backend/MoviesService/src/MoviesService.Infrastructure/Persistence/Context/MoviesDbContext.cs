@@ -21,7 +21,7 @@ namespace MoviesService.Infrastructure.Persistence.Context
         {
             modelBuilder.Entity<Movies>(e =>
             {
-                e.HasKey(m => m.MovieId);
+                e.HasKey(m => m.Id);
                 e.HasIndex(m => m.Title);
             });
 

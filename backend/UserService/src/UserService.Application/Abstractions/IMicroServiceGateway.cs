@@ -10,6 +10,6 @@
         /// </summary>
         /// <param name="userId">The unique identifier of the user.</param>
         /// <returns>A task that represents the asynchronous operation, containing true if bookings exist; otherwise, false.</returns>
-        Task<bool> HasBooking(int userId);
+        Task<bool> HasBooking(Guid userId);
     }
 }

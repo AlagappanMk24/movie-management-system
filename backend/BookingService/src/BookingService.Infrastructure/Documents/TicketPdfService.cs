@@ -21,7 +21,7 @@ namespace BookingService.Infrastructure.Documents
         private readonly IConfiguration _configuration = configuration;
 
         /// <inheritdoc />
-        public async Task<TicketPdfModel> BuildTicketPdfModelAsync(int bookingId)
+        public async Task<TicketPdfModel> BuildTicketPdfModelAsync(Guid bookingId)
         {
             var booking = await _bookingRepository.GetBookingByIdAsync(bookingId)
                 ?? throw new KeyNotFoundException($"Booking {bookingId} not found.");
@@ -36,13 +36,13 @@ namespace BookingService.Infrastructure.Documents
             byte[] posterBytes = await _gateway.DownloadImageAsync($"{movieBaseUrl}{movie.PosterUrl}");
             var seatList = await _seatRepository.GetBookedSeatsByBookingIdAsync(bookingId);
 
-            var qrText = $"BOOKING:{booking.BookingId}\nMOVIE:{movie.Title}\nDATE:{showDetails.ShowDate:dd-MM-yyyy}\nTIME:{showDetails.ShowTime}\nSCREEN:{screen.ScreenName}";
+            var qrText = $"BOOKING:{booking.Id}\nMOVIE:{movie.Title}\nDATE:{showDetails.ShowDate:dd-MM-yyyy}\nTIME:{showDetails.ShowTime}\nSCREEN:{screen.ScreenName}";
             
             var qrBytes = QrCodeHelper.GenerateQrCode(qrText);
 
             return new TicketPdfModel
             {
-                BookingId = booking.BookingId,
+                BookingId = booking.Id,
                 MovieName = movie.Title,
                 TheatreName = theatre.TheatreName,
                 Screen = screen.ScreenName,

@@ -1,23 +1,20 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Shared.Contracts.Common;
+using System.ComponentModel.DataAnnotations;
 
 namespace BookingService.Domain.Entities
 {
     /// <summary>
     /// Represents a movie ticket booking entity in the database.
     /// </summary>
-    public class Booking
+    public class Booking : BaseEntity
     {
-        /// <summary>Gets or sets the unique identifier for the booking.</summary>
-        [Key]
-        public int BookingId { get; set; }
-
         /// <summary>Gets or sets the identifier of the user who made the booking.</summary>
         [Required]
-        public int UserId { get; set; }
+        public Guid UserId { get; set; }
 
         /// <summary>Gets or sets the show identifier associated with the booking.</summary>
         [Required]
-        public int ShowId { get; set; }
+        public Guid ShowId { get; set; }
 
         /// <summary>Gets or sets the total number of seats reserved in this booking.</summary>
         [Required]
@@ -31,11 +28,5 @@ namespace BookingService.Domain.Entities
 
         /// <summary>Gets or sets the total monetary amount for the booking.</summary>
         public int TotalAmount { get; set; }
-
-        /// <summary>Gets or sets the timestamp when the booking was created.</summary>
-        public DateTime Created { get; set; }
-
-        /// <summary>Gets or sets the timestamp when the booking was last modified.</summary>
-        public DateTime Modified { get; set; }
     }
 }

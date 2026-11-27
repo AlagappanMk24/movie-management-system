@@ -17,6 +17,9 @@ namespace UserService.Infrastructure.Persistence.Context
             modelBuilder.Entity<User>()
                 .HasIndex(u => u.Email)
                 .IsUnique();
+
+            modelBuilder.Entity<User>().HasQueryFilter(u => !u.IsDeleted);
+
             base.OnModelCreating(modelBuilder);
         }
     }

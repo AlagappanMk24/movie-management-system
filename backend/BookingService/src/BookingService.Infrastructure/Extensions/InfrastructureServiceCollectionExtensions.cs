@@ -5,15 +5,14 @@ using BookingService.Infrastructure.Caching;
 using BookingService.Infrastructure.Documents;
 using BookingService.Infrastructure.Messaging;
 using BookingService.Infrastructure.Persistence.Context;
-using BookingService.Infrastructure.Repositories;
 using BookingService.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using QuestPDF.Infrastructure;
-using Microsoft.Extensions.Http;
 using BookingService.Application.Abstractions.Messaging;
 using BookingService.Application.Abstractions.Services;
+using BookingService.Infrastructure.Persistence.Repositories;
 
 namespace BookingService.Infrastructure.Extensions
 {
@@ -36,7 +35,7 @@ namespace BookingService.Infrastructure.Extensions
             services.AddScoped<DapperContext>();
 
             // Redis Distributed Cache Setup
-            var redisConnection = configuration.GetConnectionString("RaddisURL");
+            var redisConnection = configuration.GetConnectionString("RedisURL");
             services.AddStackExchangeRedisCache(options =>
             {
                 options.Configuration = redisConnection;
@@ -57,6 +56,7 @@ namespace BookingService.Infrastructure.Extensions
 
             // Messaging (RabbitMQ Singleton)
             services.AddSingleton<IMessageBusClient, MessageBusClient>();
+            services.AddHostedService<RabbitMqTopologyInitializer>();
 
             return services;
         }

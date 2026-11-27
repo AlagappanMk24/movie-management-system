@@ -2,9 +2,12 @@
 using BookingService.Application.Abstractions.Services;
 using BookingService.Application.DTOs.Analytics;
 using BookingService.Application.DTOs.Requests;
+using BookingService.Application.DTOs.Responses;
 using BookingService.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Shared.Contracts.Common;
+using System.Security.Claims;
 
 namespace BookingService.Api.Controllers
 {
@@ -45,14 +48,25 @@ namespace BookingService.Api.Controllers
             try
             {
                 _logger.LogInformation("GetBookings endpoint called.");
-                var bookings = await _bookingService.GetBookingAsync();
+                var bookings = await _bookingService.GetBookingsAsync();
                 _logger.LogInformation("Successfully retrieved {RecordCount} bookings.", bookings.Count());
-                return Ok(bookings);
+
+                return Ok(new
+                {
+                    success = true,
+                    message = "Bookings retrieved successfully.",
+                    data = bookings
+                });
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while retrieving all bookings.");
-                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An error occurred while retrieving bookings.", details = ex.Message });
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    success = false,
+                    message = "An error occurred while retrieving bookings.",
+                    details = ex.Message
+                });
             }
         }
         #endregion
@@ -65,11 +79,12 @@ namespace BookingService.Api.Controllers
         /// <response code="200">Returns the matching booking entity.</response>
         /// <response code="404">Returned if the booking does not exist.</response>
         /// <response code="500">Internal server error.</response>
-        [HttpGet("{id:int}")]
+        [HttpGet("{id:guid}")]
+        [Authorize]
         [ProducesResponseType(typeof(Booking), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetBookingById(int id)
+        public async Task<IActionResult> GetBookingById(Guid id)
         {
             try
             {
@@ -79,12 +94,31 @@ namespace BookingService.Api.Controllers
                     _logger.LogWarning("Booking with ID {BookingId} not found.", id);
                     return NotFound(new { message = $"Booking with ID {id} was not found." });
                 }
-                return Ok(booking);
+
+                var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirstValue("sub");
+                var isOwner = Guid.TryParse(userIdClaim, out var currentUserId) && booking.UserId == currentUserId;
+
+                if (!isOwner && !User.IsInRole("Admin"))
+                {
+                    return Forbid();
+                }
+
+                return Ok(new
+                {
+                    success = true,
+                    message = "Booking retrieved successfully.",
+                    data = booking
+                });
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error retrieving booking with ID {BookingId}.", id);
-                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An error occurred while fetching the booking.", details = ex.Message });
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    success = false,
+                    message = "An error occurred while fetching the booking.",
+                    details = ex.Message
+                });
             }
         }
         #endregion
@@ -96,20 +130,30 @@ namespace BookingService.Api.Controllers
         /// <param name="userId">The user identifier.</param>
         /// <response code="200">Returns the list of bookings for the user.</response>
         /// <response code="500">Internal server error.</response>
-        [HttpGet("user/{userId:int}")]
-        [ProducesResponseType(typeof(IEnumerable<Booking>), StatusCodes.Status200OK)]
+        [HttpGet("user/{userId:guid}")]
+        [ProducesResponseType(typeof(ApiResponse<IEnumerable<BookingResponse>>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetBookingsByUserId(int userId)
+        public async Task<IActionResult> GetBookingsByUserId(Guid userId)
         {
             try
             {
-                var bookings = await _bookingService.GetBookingByUserIdAsync(userId);
-                return Ok(bookings);
+                var bookings = await _bookingService.GetBookingsByUserIdAsync(userId);
+                return Ok(new
+                {
+                    success = true,
+                    message = "User bookings retrieved successfully.",
+                    data = bookings
+                });
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error retrieving bookings for user ID {UserId}.", userId);
-                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An error occurred while retrieving user bookings.", details = ex.Message });
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    success = false,
+                    message = "An error occurred while retrieving user bookings.",
+                    details = ex.Message
+                });
             }
         }
         #endregion
@@ -121,20 +165,65 @@ namespace BookingService.Api.Controllers
         /// <param name="showId">The show identifier.</param>
         /// <response code="200">Returns the list of bookings for the show.</response>
         /// <response code="500">Internal server error.</response>
-        [HttpGet("show/{showId:int}")]
+        [HttpGet("show/{showId:guid}")]
         [ProducesResponseType(typeof(IEnumerable<Booking>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetBookingsByShow(int showId)
+        public async Task<IActionResult> GetBookingsByShow(Guid showId)
         {
             try
             {
-                var bookings = await _bookingService.GetBookingByShowIdAsync(showId);
-                return Ok(bookings);
+                var bookings = await _bookingService.GetBookingsByShowIdAsync(showId);
+                return Ok(new
+                {
+                    success = true,
+                    message = "Show bookings retrieved successfully.",
+                    data = bookings
+                });
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error retrieving bookings for show ID {ShowId}.", showId);
-                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An error occurred while retrieving show bookings.", details = ex.Message });
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    success = false,
+                    message = "An error occurred while retrieving show bookings.",
+                    details = ex.Message
+                });
+            }
+        }
+        #endregion
+
+        #region Get Bookings By Movie ID
+        /// <summary>
+        /// Retrieves all booking records associated with a specific movie.
+        /// </summary>
+        /// <param name="movieId">The movie identifier.</param>
+        /// <response code="200">Returns the list of bookings for the movie.</response>
+        /// <response code="500">Internal server error.</response>
+        [HttpGet("movie/{movieId:guid}")]
+        [ProducesResponseType(typeof(IEnumerable<Booking>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> GetBookingsByMovie(Guid movieId)
+        {
+            try
+            {
+                var bookings = await _bookingService.GetBookingsByMovieIdAsync(movieId); 
+                return Ok(new
+                {
+                    success = true,
+                    message = "Movie bookings retrieved successfully.",
+                    data = bookings
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving bookings for movie ID {MovieId}.", movieId);
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    success = false,
+                    message = "An error occurred while retrieving movie bookings.",
+                    details = ex.Message
+                });
             }
         }
         #endregion
@@ -146,20 +235,30 @@ namespace BookingService.Api.Controllers
         /// <param name="showId">The show identifier.</param>
         /// <response code="200">Returns the total booked seat count.</response>
         /// <response code="500">Internal server error.</response>
-        [HttpGet("show/{showId:int}/seatcount")]
+        [HttpGet("show/{showId:guid}/seatcount")]
         [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetBookedSeatCount(int showId)
+        public async Task<IActionResult> GetBookedSeatCount(Guid showId)
         {
             try
             {
                 var count = await _bookingService.GetBookedSeatCountByShowAsync(showId);
-                return Ok(new { showId, bookedSeatCount = count });
+                return Ok(new
+                {
+                    success = true,
+                    message = "Seat count retrieved successfully.",
+                    data = new SeatCountResponse { ShowId = showId, BookedSeatCount = count }
+                });
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error fetching booked seat count for show ID {ShowId}.", showId);
-                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An error occurred while getting seat counts.", details = ex.Message });
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    success = false,
+                    message = "An error occurred while getting seat counts.",
+                    details = ex.Message
+                });
             }
         }
         #endregion
@@ -171,20 +270,30 @@ namespace BookingService.Api.Controllers
         /// <param name="bookingId">The booking identifier.</param>
         /// <response code="200">Returns a list of seat numbers.</response>
         /// <response code="500">Internal server error.</response>
-        [HttpGet("{bookingId:int}/seats")]
+        [HttpGet("{bookingId:guid}/seats")]
         [ProducesResponseType(typeof(List<string>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetBookedSeats(int bookingId)
+        public async Task<IActionResult> GetBookedSeats(Guid bookingId)
         {
             try
             {
                 var seats = await _bookingService.GetBookedSeatsAsync(bookingId);
-                return Ok(seats);
+                return Ok(new
+                {
+                    success = true,
+                    message = "Booked seats retrieved successfully.",
+                    data = seats
+                });
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error retrieving seats for booking ID {BookingId}.", bookingId);
-                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An error occurred while retrieving booked seats.", details = ex.Message });
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    success = false,
+                    message = "An error occurred while retrieving booked seats.",
+                    details = ex.Message
+                });
             }
         }
         #endregion
@@ -203,12 +312,22 @@ namespace BookingService.Api.Controllers
             try
             {
                 var collection = await _bookingService.GetMovieWiseCollectionAsync();
-                return Ok(collection);
+                return Ok(new
+                {
+                    success = true,
+                    message = "Movie collection analytics retrieved successfully.",
+                    data = collection
+                });
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error calculating movie-wise collection.");
-                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An error occurred while calculating collections.", details = ex.Message });
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    success = false,
+                    message = "An error occurred while calculating collections.",
+                    details = ex.Message
+                });
             }
         }
         #endregion
@@ -225,21 +344,38 @@ namespace BookingService.Api.Controllers
         [ProducesResponseType(typeof(Booking), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> CreateBooking([FromBody] Booking booking)
+        public async Task<IActionResult> CreateBooking([FromBody] CreateBookingRequest request)
         {
             try
             {
-                if (booking == null)
-                    return BadRequest(new { message = "Booking payload cannot be null." });
+                if (!ModelState.IsValid)
+                    return BadRequest(new { success = false, message = "Invalid payload." });
 
-                _logger.LogInformation("Creating booking record.");
-                var createdBooking = await _bookingService.CreateBookingAsync(booking);
-                return CreatedAtAction(nameof(GetBookingById), new { id = createdBooking.BookingId }, createdBooking);
+
+                var created = await _bookingService.CreateBookingAsync(request);
+
+                return CreatedAtAction(nameof(GetBookingById), new { id = created.Id },
+                    new ApiResponse<BookingResponse>
+                    {
+                        Success = true,
+                        Message = "Booking created successfully.",
+                        Data = created
+                    });
+            }
+            catch (InvalidOperationException ex)          // domain / validation failure
+            {
+                _logger.LogWarning(ex, "Booking validation failed.");
+                return BadRequest(new { success = false, message = ex.Message });
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error creating booking.");
-                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An error occurred while creating the booking.", details = ex.Message });
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    success = false,
+                    message = "An error occurred while creating the booking.",
+                    details = ex.Message
+                });
             }
         }
         #endregion
@@ -264,19 +400,25 @@ namespace BookingService.Api.Controllers
 
                 return StatusCode(StatusCodes.Status201Created, new
                 {
+                    success = true,
                     message = "Booking created successfully with seats.",
-                    bookingId
+                    data = new { bookingId }
                 });
             }
             catch (InvalidOperationException ex)
             {
                 _logger.LogWarning(ex, "Seat reservation conflict during booking creation.");
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(new { success = false, message = ex.Message });
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error creating booking with seats.");
-                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An error occurred during booking creation.", details = ex.Message });
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    success = false,
+                    message = "An error occurred during booking creation.",
+                    details = ex.Message
+                });
             }
         }
         #endregion
@@ -303,17 +445,26 @@ namespace BookingService.Api.Controllers
                     request.SeatNos
                 );
 
-                return Ok(new { message = "Seats booked successfully using TVP." });
+                return Ok(new
+                {
+                    success = true,
+                    message = "Seats booked successfully using TVP."
+                });
             }
             catch (InvalidOperationException ex)
             {
                 _logger.LogWarning(ex, "Bulk seat locking conflict.");
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(new { success = false, message = ex.Message });
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error during bulk seat booking.");
-                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An error occurred during bulk seat reservation.", details = ex.Message });
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    success = false,
+                    message = "An error occurred during bulk seat reservation.",
+                    details = ex.Message
+                });
             }
         }
         #endregion
@@ -334,24 +485,34 @@ namespace BookingService.Api.Controllers
         {
             if (file == null || file.Length == 0)
             {
-                return BadRequest(new { message = "No file uploaded or file is empty." });
+                return BadRequest(new { success = false, message = "No file uploaded or file is empty." });
             }
 
             try
             {
                 using var stream = file.OpenReadStream();
                 await _bookingExcelService.UploadAndBulkInsertSeatsAsync(stream);
-                return Ok(new { message = "Seats booked successfully from Excel file." });
+
+                return Ok(new
+                {
+                    success = true,
+                    message = "Seats booked successfully from Excel file."
+                });
             }
             catch (InvalidOperationException ex)
             {
                 _logger.LogWarning(ex, "Validation error while processing uploaded Excel file.");
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(new { success = false, message = ex.Message });
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error processing Excel upload.");
-                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An error occurred while parsing the Excel file.", details = ex.Message });
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    success = false,
+                    message = "An error occurred while parsing the Excel file.",
+                    details = ex.Message
+                });
             }
         }
         #endregion
@@ -364,25 +525,34 @@ namespace BookingService.Api.Controllers
         /// <response code="200">Returns true if cancellation succeeded.</response>
         /// <response code="404">Returned if the booking was not found.</response>
         /// <response code="500">Internal server error.</response>
-        [HttpPut("cancel/{id:int}")]
+        [HttpPut("cancel/{id:guid}")]
         [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> CancelBooking(int id)
+        public async Task<IActionResult> CancelBooking(Guid id)
         {
             try
             {
                 var success = await _bookingService.CancelBookingAsync(id);
                 if (!success)
                 {
-                    return NotFound(new { message = $"Booking with ID {id} not found." });
+                    return NotFound(new { success = false, message = $"Booking with ID {id} not found." });
                 }
-                return Ok(new { success, message = "Booking cancelled successfully." });
+                return Ok(new
+                {
+                    success = true,
+                    message = "Booking cancelled successfully."
+                });
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error cancelling booking ID {BookingId}.", id);
-                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An error occurred while cancelling the booking.", details = ex.Message });
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    success = false,
+                    message = "An error occurred while cancelling the booking.",
+                    details = ex.Message
+                });
             }
         }
         #endregion
@@ -396,25 +566,35 @@ namespace BookingService.Api.Controllers
         /// <response code="200">Returns true if update succeeded.</response>
         /// <response code="404">Returned if the booking was not found.</response>
         /// <response code="500">Internal server error.</response>
-        [HttpPut("status/{id:int}")]
+        [HttpPut("status/{id:guid}")]
         [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> UpdateBookingStatus(int id, [FromQuery] string paymentStatus)
+        public async Task<IActionResult> UpdateBookingStatus(Guid id, [FromBody] UpdateBookingStatusRequest request)
         {
             try
             {
-                var result = await _bookingService.UpdateBookingStatusAsync(id, paymentStatus);
+                var result = await _bookingService.UpdateBookingStatusAsync(id, request.PaymentStatus);
                 if (!result)
                 {
-                    return NotFound(new { message = $"Booking with ID {id} not found." });
+                    return NotFound(new { success = false, message = $"Booking with ID {id} not found." });
                 }
-                return Ok(new { success = result, message = "Booking status updated successfully." });
+
+                return Ok(new
+                {
+                    success = true,
+                    message = "Booking status updated successfully."
+                });
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error updating status for booking ID {BookingId}.", id);
-                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An error occurred while updating status.", details = ex.Message });
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    success = false,
+                    message = "An error occurred while updating status.",
+                    details = ex.Message
+                });
             }
         }
         #endregion
@@ -427,11 +607,11 @@ namespace BookingService.Api.Controllers
         /// <response code="200">Returns the PDF file binary stream.</response>
         /// <response code="404">Returned if booking or related assets were not found.</response>
         /// <response code="500">Internal server error.</response>
-        [HttpGet("download/{bookingId:int}")]
+        [HttpGet("download/{bookingId:guid}")]
         [ProducesResponseType(typeof(FileContentResult), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> DownloadTicket(int bookingId)
+        public async Task<IActionResult> DownloadTicket(Guid bookingId)
         {
             try
             {
@@ -447,12 +627,17 @@ namespace BookingService.Api.Controllers
             catch (KeyNotFoundException ex)
             {
                 _logger.LogWarning(ex, "Booking asset not found during PDF download.");
-                return NotFound(new { message = ex.Message });
+                return NotFound(new { success = false, message = ex.Message });
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error generating ticket PDF for booking ID {BookingId}.", bookingId);
-                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An error occurred while generating the PDF ticket.", details = ex.Message });
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    success = false,
+                    message = "An error occurred while generating the PDF ticket.",
+                    details = ex.Message
+                });
             }
         }
         #endregion
@@ -465,11 +650,11 @@ namespace BookingService.Api.Controllers
         /// <response code="200">Returns the PNG image stream.</response>
         /// <response code="404">Returned if booking was not found.</response>
         /// <response code="500">Internal server error.</response>
-        [HttpGet("qr/{bookingId:int}")]
+        [HttpGet("qr/{bookingId:guid}")]
         [ProducesResponseType(typeof(FileContentResult), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetQrCode(int bookingId)
+        public async Task<IActionResult> GetQrCode(Guid bookingId)
         {
             try
             {
@@ -484,12 +669,17 @@ namespace BookingService.Api.Controllers
             catch (KeyNotFoundException ex)
             {
                 _logger.LogWarning(ex, "Booking not found for QR code generation.");
-                return NotFound(new { message = ex.Message });
+                return NotFound(new { success = false, message = ex.Message });
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error generating QR code for booking ID {BookingId}.", bookingId);
-                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An error occurred while generating the QR code.", details = ex.Message });
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    success = false,
+                    message = "An error occurred while generating the QR code.",
+                    details = ex.Message
+                });
             }
         }
         #endregion

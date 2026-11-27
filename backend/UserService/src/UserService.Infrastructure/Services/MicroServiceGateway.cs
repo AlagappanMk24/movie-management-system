@@ -17,7 +17,7 @@ namespace UserService.Infrastructure.Services
         /// </summary>
         /// <param name="userId">The user identifier.</param>
         /// <returns>True if the user has bookings; otherwise, false.</returns>
-        public async Task<bool> HasBooking(int userId)
+        public async Task<bool> HasBooking(Guid userId)
         {
             var baseUrl = _config["MicroserviceUrls:BookingService"];
 

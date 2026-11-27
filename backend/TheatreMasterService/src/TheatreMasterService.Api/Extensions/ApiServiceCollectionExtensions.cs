@@ -26,7 +26,7 @@ namespace TheatreMasterService.Api.Extensions
             services.AddEndpointsApiExplorer();
 
             // Background Workers (RabbitMQ Subscriber)
-            services.AddHostedService<RabbitMQSubscriber>();
+            services.AddHostedService<BookingConfirmedConsumer>();
 
             return services;
         }

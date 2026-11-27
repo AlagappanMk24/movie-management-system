@@ -14,7 +14,7 @@ namespace ReviewService.Application.Services
         #endregion
 
         /// <inheritdoc />
-        public async Task CreateReviewAsync(CreateReviewDto dto, int userId)
+        public async Task CreateReviewAsync(CreateReviewDto dto, Guid userId)
         {
             if (!Enum.IsDefined(typeof(ReviewCategory), dto.Category))
                 throw new Exception("Invalid review category");
@@ -31,25 +31,25 @@ namespace ReviewService.Application.Services
                 UserId = userId,
                 Category = dto.Category,
                 Description = dto.Description,
-                CreatedAt = DateTime.UtcNow
+                Created = DateTime.UtcNow
             };
 
             await _repository.AddAsync(review);
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<Review>> GetReviewsByMovieAsync(int movieId)
+        public async Task<IEnumerable<Review>> GetReviewsByMovieAsync(Guid movieId)
         {
             var reviews = await _repository.GetByMovieIdAsync(movieId);
 
             return reviews.Select(r => new Review
             {
-                ReviewId = r.ReviewId,
+                Id = r.Id,
                 MovieId = r.MovieId,
                 UserId = r.UserId,
                 Category = r.Category,
                 Description = r.Description,
-                CreatedAt = r.CreatedAt
+                Created = r.Created
             });
         }
 
@@ -60,17 +60,17 @@ namespace ReviewService.Application.Services
 
             return reviews.Select(r => new Review
             {
-                ReviewId = r.ReviewId,
+                Id = r.Id,
                 MovieId = r.MovieId,
                 UserId = r.UserId,
                 Category = r.Category,
                 Description = r.Description,
-                CreatedAt = r.CreatedAt
+                Created = r.Created
             });
         }
 
         /// <inheritdoc />
-        public async Task UpdateReviewAsync(int reviewId, UpdateReviewDto dto, int userId)
+        public async Task UpdateReviewAsync(Guid reviewId, UpdateReviewDto dto, Guid userId)
         {
             if (!Enum.IsDefined(typeof(ReviewCategory), dto.Category))
                 throw new Exception("Invalid review category");
@@ -85,7 +85,7 @@ namespace ReviewService.Application.Services
 
             review.Category = dto.Category;
             review.Description = dto.Description;
-            review.UpdatedAt = DateTime.UtcNow;
+            review.Modified = DateTime.UtcNow;
 
             await _repository.UpdateAsync(review);
         }

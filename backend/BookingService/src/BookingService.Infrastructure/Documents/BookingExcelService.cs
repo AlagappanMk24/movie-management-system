@@ -31,8 +31,8 @@ namespace BookingService.Infrastructure.Documents
             {
                 var seatNo = row.Cell(3).GetString().Trim();
 
-                if (!row.Cell(1).TryGetValue(out int bookingId) ||
-                    !row.Cell(2).TryGetValue(out int showId) ||
+                if (!row.Cell(1).TryGetValue(out Guid bookingId) ||
+                    !row.Cell(2).TryGetValue(out Guid showId) ||
                     string.IsNullOrWhiteSpace(seatNo) ||
                     !row.Cell(4).TryGetValue(out int price))
                 {
